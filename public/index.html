@@ -1,3 +1,4 @@
+<!-- UPDATED FOR LOADING FIX + VERCEL DEPLOYMENT -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -458,12 +459,17 @@ let childMastery={};
 async function sbFetchSafe(path,opts={}){try{return await sbFetch(path,opts);}catch(e){console.error(e);return null;}}
 
 async function init(){
+  document.getElementById('land-loading').innerHTML='<span class="spin">⏳</span> Loading app data…';
+  const timeout=(ms)=>new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms));
   try{
-    const [sets,kids,assigns,masteryRows]=await Promise.all([
-      sbFetch('app_settings?id=eq.global&select=*'),
-      sbFetch('children?select=*&order=created_at.asc'),
-      sbFetchSafe('topic_suggestions?select=*'),
-      sbFetchSafe('topic_mastery?select=*')
+    const [sets,kids,assigns,masteryRows]=await Promise.race([
+      Promise.all([
+        sbFetch('app_settings?id=eq.global&select=*'),
+        sbFetch('children?select=*&order=created_at.asc'),
+        sbFetchSafe('topic_suggestions?select=*'),
+        sbFetchSafe('topic_mastery?select=*')
+      ]),
+      timeout(4000)
     ]);
     if(sets&&sets[0])appSettings={...appSettings,...sets[0]};
     if(kids)allChildren=kids;
@@ -473,14 +479,12 @@ async function init(){
       childTopicAssignments[a.child_id].push({topic:a.topic,subject:a.subject,grade:a.grade});
     });
     childMastery={};
-    (masteryRows||[]).forEach(r=>{
-      const key=`${r.child_id}__${r.subject}__${r.topic}`;
-      childMastery[key]=r;
-    });
+    (masteryRows||[]).forEach(r=>{ childMastery[`${r.child_id}__${r.subject}__${r.topic}`]=r; });
     document.getElementById('land-loading').classList.add('hidden');
     const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
   }catch(e){
-    document.getElementById('land-loading').innerHTML='<span style="color:var(--r)">⚠️ Connection issue. Please refresh.</span>';
+    document.getElementById('land-loading').innerHTML='';
+    const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
   }
 }
 init();
