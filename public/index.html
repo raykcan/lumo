@@ -1275,7 +1275,7 @@ async function endSprint(){
   const t=((Date.now()-fsStart)/1000).toFixed(1);const correct=fsAnswers.filter(a=>a.correct).length;const acc=Math.round(correct/fsAnswers.length*100);
   document.getElementById('fs-active').style.display='none';document.getElementById('fs-results').style.display='block';
   document.getElementById('fs-r-time').textContent=t+'s';document.getElementById('fs-r-acc').textContent=acc+'%';
-  document.getElementById('fs-r-bd').innerHTML=fsAnswers.map(a=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;background:${a.correct?'var(--gl)':'var(--rl)'}"><span style="font-size:13px">${a.correct?'✅':'❌'}</span><span style="font-size:12px;font-weight:700;flex:1;color:${a.correct?'#065F46':'#991B1B'}">${a.q} ${a.ans}</span>${!a.correct?`<span style="font-size:11px;color:#991B1B">You: ${a.user}</span>`:''}</div>`).join('');
+  document.getElementById('fs-r-bd').innerHTML=fsAnswers.map(a=>'<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;background:'+(a.correct?'var(--gl)':'var(--rl)')+'"><span style="font-size:13px">'+(a.correct?'✅':'❌')+'</span><span style="font-size:12px;font-weight:700;flex:1;color:'+(a.correct?'#065F46':'#991B1B')+'">'+a.q+' '+a.ans+'</span>'+(!a.correct?'<span style="font-size:11px;color:#991B1B">You: '+a.user+'</span>':'')+'</div>').join('');
   if(currentChild){
     currentChild.stars+=Math.floor(acc/20);document.getElementById('h-stars').textContent=currentChild.stars;
     await sbFetchSafe('children?id=eq.'+currentChild.id,{method:'PATCH',body:JSON.stringify({stars:currentChild.stars})});
