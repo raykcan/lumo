@@ -452,31 +452,17 @@ let sessAnswered=false;
 let sessStars=0;
 let fsOp='add';
 let fsQs=[];let fsIdx=0;let fsStart=0;let fsTimerInt=null;let fsAnswers=[];
-let childTopicAssignments={};
-let childMastery={};
 
 async function sbFetchSafe(path,opts={}){try{return await sbFetch(path,opts);}catch(e){console.error(e);return null;}}
 
 async function init(){
   try{
-    const [sets,kids,assigns,masteryRows]=await Promise.all([
+    const [sets,kids]=await Promise.all([
       sbFetch('app_settings?id=eq.global&select=*'),
-      sbFetch('children?select=*&order=created_at.asc'),
-      sbFetchSafe('topic_suggestions?select=*'),
-      sbFetchSafe('topic_mastery?select=*')
+      sbFetch('children?select=*&order=created_at.asc')
     ]);
     if(sets&&sets[0])appSettings={...appSettings,...sets[0]};
     if(kids)allChildren=kids;
-    childTopicAssignments={};
-    (assigns||[]).filter(a=>a.status==='approved').forEach(a=>{
-      if(!childTopicAssignments[a.child_id])childTopicAssignments[a.child_id]=[];
-      childTopicAssignments[a.child_id].push({topic:a.topic,subject:a.subject,grade:a.grade});
-    });
-    childMastery={};
-    (masteryRows||[]).forEach(r=>{
-      const key=`${r.child_id}__${r.subject}__${r.topic}`;
-      childMastery[key]=r;
-    });
     document.getElementById('land-loading').classList.add('hidden');
     const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
   }catch(e){
@@ -651,7 +637,7 @@ function selectSubject(id){
   cfg.subject=id;
   SUBJECTS.forEach(s=>{const b=document.getElementById('sb-'+s.id);if(b){b.style.borderColor=s.id===id?'var(--p)':'var(--br)';b.style.background=s.id===id?'var(--pl)':'#fff';}});
   const grade=currentChild?.grade||'Grade 1';
-  const baseTopics=(TOPICS[id]||{})[grade]||['General']; const addedTopics=currentChild?getChildAssignedTopics(currentChild.id,id,grade):[]; const gradeTopics=[...new Set([...baseTopics,...addedTopics])];
+  const gradeTopics=(TOPICS[id]||{})[grade]||['General'];
   const box=document.getElementById('topic-checkboxes');
   box.innerHTML=gradeTopics.map(t=>`
     <label class="topic-chk-lbl" style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:10px;border:2px solid var(--br);cursor:pointer;font-size:13px;font-weight:700;background:#fff;transition:all .15s;user-select:none">
@@ -695,7 +681,7 @@ function setLang(l){cfg.lang=l;['mixed','en','fr'].forEach(v=>{const b=document.
 async function startSession(){
   if(!cfg.subject){toast('Please choose a subject! 📚');return;}
   if(!cfg.topics||!cfg.topics.length){toast('Please choose at least one topic! 🎯');return;}
-  sessionQs=[];sessIdx=0;sessAnswered=false;sessStars=0;_usedQIndices.clear();
+  sessionQs=[];sessIdx=0;sessAnswered=false;sessStars=0;
   document.getElementById('sess-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('q-tot').textContent=cfg.count;
   document.getElementById('sess-stars').textContent='0';
@@ -1013,36 +999,18 @@ function getQuestions(subject, topic, grade) {
   } catch(e) { return null; }
 }
 
-function getChildAssignedTopics(childId, subjectId, grade){
-  const subjLabel=SUBJECTS.find(s=>s.id===subjectId)?.label||subjectId;
-  return (childTopicAssignments[childId]||[])
-    .filter(a=>(a.grade===grade||!a.grade) && (a.subject===subjLabel || a.subject===subjectId))
-    .map(a=>a.topic);
-}
-function getMasteryKey(childId, subjectId, topic){
-  return `${childId}__${subjectId}__${topic}`;
-}
-function getTopicDifficulty(childId, subjectId, topic){
-  const row=childMastery[getMasteryKey(childId,subjectId,topic)]||{};
-  return Math.max(1,Math.min(5,row.level||1));
-}
-function getDifficultyLabel(level){
-  return ['starter','easy','steady','challenging','advanced'][Math.max(1,Math.min(5,level))-1];
-}
-function getSessionUsedKey(subject,grade,topic,index){
-  return `${subject}__${grade}__${topic}__${index}`;
-}
-
 function getQFromBank(subject, topic, grade, idx, usedIndices) {
   const pool = getQuestions(subject, topic, grade);
   if (!pool) return null;
-  const available = pool.map((q,i) => i).filter(i => !usedIndices.has(getSessionUsedKey(subject,grade,topic,i)));
+  // Find an unused question
+  const available = pool.map((q,i) => i).filter(i => !usedIndices.has(i));
   if (available.length === 0) {
-    pool.forEach((_,i)=>usedIndices.delete(getSessionUsedKey(subject,grade,topic,i)));
+    // All used — reset and reuse
+    usedIndices.clear();
     return pool[idx % pool.length];
   }
   const pick = available[Math.floor(Math.random() * available.length)];
-  usedIndices.add(getSessionUsedKey(subject,grade,topic,pick));
+  usedIndices.add(pick);
   return pool[pick];
 }
 
@@ -1069,7 +1037,7 @@ async function genQ(idx) {
   return await genQFromAI(idx, lang, subj, grade, topic);
 }
 
-async function genQFromAI(idx, lang, subj, grade, topic, level=1) {
+async function genQFromAI(idx, lang, subj, grade, topic) {
   const gNum = parseInt(grade.replace('Grade ', '')) || 1;
   const typeRot = ['mc','input','tf','mc','mc','input','tf','mc','mc','input'];
   let qType = typeRot[idx % typeRot.length];
@@ -1082,7 +1050,7 @@ async function genQFromAI(idx, lang, subj, grade, topic, level=1) {
     ? 'Multiple choice — exactly 4 options (A,B,C,D), make distractors plausible.'
     : qType === 'input' ? 'Short answer — a specific word, number, or short phrase.'
     : 'True/False — make it thoughtful, not obviously true/false.';
-  const diffBase = gNum <= 2 ? 'concrete & relatable' : gNum <= 4 ? 'requires understanding' : 'analytical, apply knowledge'; const diff=`${diffBase}; difficulty level ${level}/5 (${getDifficultyLabel(level)}); make it harder as mastery increases`; 
+  const diff = gNum <= 2 ? 'concrete & relatable' : gNum <= 4 ? 'requires understanding' : 'analytical, apply knowledge';
   const prevQs = sessionQs.map(q => q.text).slice(-5).join(' | ');
   const sys = 'You are Lumo, a curriculum-aligned educational AI. Return ONLY valid JSON — no markdown.';
   const prompt = `Generate ONE ${langLabel} question for Grade ${gNum} students.
@@ -1092,8 +1060,8 @@ Curriculum: ${currentChild?.curriculum || 'Canadian'}
 Type: ${typeInstr}
 Difficulty: ${diff}
 ${cfg.mode === 'exam' ? 'EXAM MODE.' : 'PRACTICE MODE — include hint.'}
-Avoid repeating these recent questions: [${prevQs}]\nUse a fresh angle, different numbers, different phrasing, and different format when possible.\nIf suitable, vary with picture-style, chart-style, graph-style, table-style, or map-style text prompts that can be shown without external images.
-JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B","C","D"],' : ''}"answer":"...","hint":"...","explanation":"..."}. Create varied questions, not near-duplicates.
+Avoid repeating: [${prevQs}]
+JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B","C","D"],' : ''}"answer":"...","hint":"...","explanation":"..."}`;
   try {
     const raw = await claudeAsk(prompt, sys);
     const parsed = JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g, '').trim());
@@ -1125,7 +1093,7 @@ function renderQ(q){
   document.getElementById('q-subj-badge').textContent=(subj?.emoji||'')+' '+(subj?.label||'');
   document.getElementById('q-lang-badge').textContent=q.lang==='fr'?'🇫🇷 Français':q.lang==='ar'?'📜 عربي':'🇨🇦 English';
   document.getElementById('q-exam-badge').classList.toggle('hidden',!q.examMode);
-  document.getElementById('q-type-badge').textContent=({mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type)+(q.difficultyLabel?` • ${q.difficultyLabel}`:'');
+  document.getElementById('q-type-badge').textContent={mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type;
   document.getElementById('q-text').textContent=q.text;
   document.getElementById('q-text').style.direction=q.lang==='ar'?'rtl':'ltr';
   document.getElementById('q-mc').innerHTML='';
@@ -1461,8 +1429,6 @@ function assignTopicToChild(childId,childName,topic,subject,grade){
 async function confirmAssignTopic(childId,childName,topic,subject,grade){
   hideModal();
   await sbFetchSafe('topic_suggestions',{method:'POST',body:JSON.stringify({child_id:childId,topic,subject,grade,status:'approved',rationale:'Manually assigned by parent',created_at:new Date().toISOString()})});
-  if(!childTopicAssignments[childId])childTopicAssignments[childId]=[];
-  childTopicAssignments[childId].push({topic,subject,grade});
   toast(`📌 ${topic} added to ${childName}!`);
 }
 async function approveSug(id){await sbFetchSafe('topic_suggestions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'approved'})});toast('✅ Approved!');showDashTab(currentDashTab);}
