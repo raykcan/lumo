@@ -1399,25 +1399,25 @@ async function renderDashTopics(el){
   el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
   try{
     const sugs=await sbFetch('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc')||[];
-    el.innerHTML=`<div class="section-title">${L?'Gestion des sujets':'Topic Management'}</div>
-    <div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🔔 ${L?'Suggestions en attente':'Pending Suggestions'}</div>
-    ${!sugs.length?`<div style="color:var(--mu);font-weight:700;font-size:13px">${L?'Aucune suggestion.':'No suggestions yet.'}</div>`:sugs.map(s=>`<div style="background:${s.status==='approved'?'var(--gl)':s.status==='rejected'?'var(--rl)':'var(--yl)'};border-radius:11px;padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span>${s.children?.mascot||'🦁'}</span><span style="font-weight:800;font-size:12px">${s.children?.name||''}</span><span class="badge ${s.status==='approved'?'badge-g':s.status==='rejected'?'badge-r':'badge-y'}">${s.status}</span></div><div style="font-size:13px;font-weight:700;margin-bottom:5px">${s.topic}</div><div style="font-size:11px;color:var(--mu);font-weight:600;margin-bottom:8px">${s.rationale||''}</div>${s.status==='pending'?`<div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" style="flex:1" onclick="approveSug('${s.id}')">✓ ${L?'Approuver':'Approve'}</button><button class="btn btn-danger btn-sm" style="flex:1" onclick="rejectSug('${s.id}')">✗ ${L?'Rejeter':'Reject'}</button></div>`:''}</div>`).join('')}
-    </div>
-    <div class="card" style="margin-bottom:14px">
-      <div style="font-weight:800;font-size:14px;margin-bottom:10px">📚 ${L?'Naviguer et ajouter des sujets':'Browse & Add Topics'}</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-        <input id="topic-search" type="text" placeholder="${L?'Rechercher un sujet…':'Search topics…'}" oninput="filterCurriculumTopics()" style="flex:1;min-width:160px;font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none">
-        <select id="topic-child-sel" onchange="filterCurriculumTopics()" style="font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none">
-          <option value="">${L?'Tout enfant':'All children'}</option>
-          ${allChildren.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
-        </select>
-        <select id="topic-grade-sel" onchange="filterCurriculumTopics()" style="font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none">
-          <option value="">${L?'Toutes les années':'All Grades'}</option>
-          ${['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6'].map(g=>`<option value="${g}">${g}</option>`).join('')}
-        </select>
-      </div>
-      <div id="curriculum-topic-list" style="display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto"></div>
-    </div>`;
+    let h='<div class="section-title">'+(L?'Gestion des sujets':'Topic Management')+'</div>';
+    h+='<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🔔 '+(L?'Suggestions en attente':'Pending Suggestions')+'</div>';
+    if(!sugs.length){
+      h+='<div style="color:var(--mu);font-weight:700;font-size:13px">'+(L?'Aucune suggestion.':'No suggestions yet.')+'</div>';
+    }else{
+      h+=sugs.map(s=>{
+        let c='<div style="background:'+(s.status==='approved'?'var(--gl)':s.status==='rejected'?'var(--rl)':'var(--yl)')+';border-radius:11px;padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span>'+(s.children?.mascot||'🦁')+'</span><span style="font-weight:800;font-size:12px">'+(s.children?.name||'')+'</span><span class="badge '+(s.status==='approved'?'badge-g':s.status==='rejected'?'badge-r':'badge-y')+'">'+s.status+'</span></div><div style="font-size:13px;font-weight:700;margin-bottom:5px">'+s.topic+'</div><div style="font-size:11px;color:var(--mu);font-weight:600;margin-bottom:8px">'+(s.rationale||'')+'</div>';
+        if(s.status==='pending'){
+          c+='<div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" style="flex:1" onclick="approveSug(\''+s.id+'\')">✓ '+(L?'Approuver':'Approve')+'</button><button class="btn btn-danger btn-sm" style="flex:1" onclick="rejectSug(\''+s.id+'\')">✗ '+(L?'Rejeter':'Reject')+'</button></div>';
+        }
+        c+='</div>';return c;
+      }).join('');
+    }
+    h+='</div>';
+    h+='<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">📚 '+(L?'Naviguer et ajouter des sujets':'Browse & Add Topics')+'</div>';
+    h+='<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><input id="topic-search" type="text" placeholder="'+(L?'Rechercher un sujet…':'Search topics…')+'" oninput="filterCurriculumTopics()" style="flex:1;min-width:160px;font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none"></div>';
+    h+='<div id="curr-topics" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto"></div></div>';
+    el.innerHTML=h;
+    setTimeout(renderCurriculumTopics,50);
     filterCurriculumTopics();
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load topics.</div>';}
 }
