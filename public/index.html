@@ -1439,17 +1439,13 @@ function filterCurriculumTopics(){
       });
     });
   });
-  if(!results.length){container.innerHTML=`<div style="color:var(--mu);font-weight:700;font-size:13px;text-align:center;padding:16px">${L?'Aucun sujet trouvé.':'No topics found.'}</div>`;return;}
-  container.innerHTML=results.slice(0,60).map(r=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--br);background:#fff">
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:800;color:var(--p)">${r.topic}</div>
-        <div style="font-size:10px;color:var(--mu);font-weight:600">${r.subjLabel} • ${r.grade}</div>
-      </div>
-      <div style="display:flex;gap:5px;flex-shrink:0">
-        ${allChildren.map(c=>`<button class="btn btn-sm" style="font-size:10px;padding:4px 8px;background:var(--pl);color:var(--p);border:none;border-radius:7px" onclick="assignTopicToChild('${c.id}','${c.name}','${r.topic}','${r.subjLabel}','${r.grade}')" title="Add to ${c.name}">${c.mascot}</button>`).join('')}
-      </div>
-    </div>`).join('')+(results.length>60?`<div style="text-align:center;color:var(--mu);font-size:11px;font-weight:700;padding:8px">Refine your search to see more results (${results.length} total)</div>`:'');
+  if(!results.length){container.innerHTML='<div style="color:var(--mu);font-weight:700;font-size:13px;text-align:center;padding:16px">'+(L?'Aucun sujet trouvé.':'No topics found.')+'</div>';return;}
+  container.innerHTML=results.slice(0,60).map(r=>{
+    let html='<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--br);background:#fff"><div style="flex:1"><div style="font-size:12px;font-weight:800;color:var(--p)">'+r.topic+'</div><div style="font-size:10px;color:var(--mu);font-weight:600">'+r.subjLabel+' • '+r.grade+'</div></div><div style="display:flex;gap:5px;flex-shrink:0">';
+    html+=allChildren.map(c=>'<button class="btn btn-sm btn-secondary" style="font-size:10px;padding:5px 8px" onclick="confirmAssignTopic(\''+c.id+'\',\''+c.name+'\',\''+r.topic+'\',\''+r.subjLabel+'\',\''+r.grade+'\')">+ '+c.mascot+'</button>').join('');
+    html+='</div></div>';
+    return html;
+  }).join('')+(results.length>60?'<div style="text-align:center;color:var(--mu);font-size:11px;font-weight:700;padding:8px">Refine your search to see more results ('+results.length+' total)</div>':'');
 }
 function assignTopicToChild(childId,childName,topic,subject,grade){
   showModal(`
