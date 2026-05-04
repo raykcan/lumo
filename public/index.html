@@ -1127,9 +1127,9 @@ function renderQ(q){
   document.getElementById('q-prog').style.width=((sessIdx+1)/cfg.count*100)+'%';
   const subj=SUBJECTS.find(s=>s.id===cfg.subject);
   document.getElementById('q-subj-badge').textContent=(subj?.emoji||'')+' '+(subj?.label||'');
-  document.getElementById('q-lang-badge').textContent=q.lang==='fr'?'🇫🇷 Français':q.lang==='ar'?'📜 عربي':'🇨🇦 English';
+  document.getElementById('q-lang-badge').textContent=(q.lang==='fr'?'🇫🇷 Français':q.lang==='ar'?'📜 عربي':'🇨🇦 English');
   document.getElementById('q-exam-badge').classList.toggle('hidden',!q.examMode);
-  document.getElementById('q-type-badge').textContent=({mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type)+(q.difficultyLabel?` • ${q.difficultyLabel}`:'');
+  document.getElementById('q-type-badge').textContent=(({mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type)+(q.difficultyLabel?' • '+q.difficultyLabel:''));
   document.getElementById('q-text').textContent=q.text;
   document.getElementById('q-text').style.direction=q.lang==='ar'?'rtl':'ltr';
   document.getElementById('q-mc').innerHTML='';
