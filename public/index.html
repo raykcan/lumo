@@ -622,12 +622,10 @@ async function saveProfileName(){
   toast('Name saved! ✨');
 }
 function openMascotPicker(){
-  showModal('<h3 style="font-family:\'Fredoka One\',cursive;font-size:19px;color:var(--p);margin-bottom:14px">Choose Your Mascot!</h3>'
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-    ${MASCOTS.map(m=>`<div onclick="pickMascot('${m.e}',this)" style="text-align:center;padding:10px;border-radius:12px;cursor:pointer;border:2px solid ${currentChild.mascot===m.e?'var(--p)':'var(--br)'};background:${currentChild.mascot===m.e?'var(--pl)':'#fff'}">
-      <div style="font-size:32px">${m.e}</div><div style="font-size:9px;font-weight:700;color:var(--mu);margin-top:2px">${m.n}</div>
-    </div>`).join('')}
-  </div><button class="btn btn-ghost btn-full" style="margin-top:14px" onclick="hideModal()">Cancel</button>`);
+  showModal('<h3 style="font-family:\'Fredoka One\',cursive;font-size:19px;color:var(--p);margin-bottom:14px">Choose Your Mascot!</h3>'+
+  '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">'+
+    MASCOTS.map(m=>'<div onclick="pickMascot(\''+m.e+'\',this)" style="text-align:center;padding:10px;border-radius:12px;cursor:pointer;border:2px solid '+(currentChild.mascot===m.e?'var(--p)':'var(--br)')+';background:'+(currentChild.mascot===m.e?'var(--pl)':'#fff')+'"><div style="font-size:32px">'+m.e+'</div><div style="font-size:9px;font-weight:700;color:var(--mu);margin-top:2px">'+m.n+'</div></div>').join('')+
+  '</div><button class="btn btn-ghost btn-full" style="margin-top:14px" onclick="hideModal()">Cancel</button>');
 }
 async function pickMascot(emoji){
   currentChild.mascot=emoji;document.getElementById('h-mascot').textContent=emoji;
