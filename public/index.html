@@ -394,8 +394,8 @@ input:focus,select:focus{border-color:var(--p)}
 <div id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#1E1B4B;color:#fff;padding:10px 22px;border-radius:100px;font-weight:700;font-size:13px;transition:transform .3s;z-index:2000;pointer-events:none;white-space:nowrap"></div>
 
 <script>
-const SB_URL='sb_publishable_jknkJ-FqbDUdKjU3UfECnQ_-kxIGhoU';
-const SB_KEY='https://jwyapunaktwmyxwvfpeb.supabase.co';
+const SB_URL='https://jwyapunaktwmyxwvfpeb.supabase.co';
+const SB_KEY='sb_publishable_jknkJ-FqbDUdKjU3UfECnQ_-kxIGhoU';
 const CLAUDE_MODEL='claude-sonnet-4-20250514';
 
 async function sbFetch(path,opts={}){
@@ -1106,11 +1106,11 @@ JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B"
     // Ultimate fallback - return a simple question
     return {
       type: 'mc',
-      text: `What is an important concept in ${topic}?`,
+      text: 'What is an important concept in '+topic+'?',
       opts: ['Review your notes', 'Ask your teacher', topic, 'Study more'],
       answer: topic,
-      hint: `Think about what you have learned in ${topic}.`,
-      explanation: `Keep studying ${topic} — you're doing great!`,
+      hint: 'Think about what you have learned in '+topic+'.',
+      explanation: 'Keep studying '+topic+' — you're doing great!',
       topic, lang, examMode: cfg.mode === 'exam', userCorrect: null
     };
   }
