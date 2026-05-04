@@ -1291,7 +1291,7 @@ async function renderSprintHistory(){
   const sprints=await sbFetchSafe('flash_sprints?child_id=eq.'+currentChild.id+'&order=created_at.desc&limit=4');
   if(!sprints||!sprints.length){el.innerHTML='';return;}
   const ops={add:'Add',sub:'Sub',mul:'Mul',div:'Div'};
-  el.innerHTML=`<div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p);margin-bottom:10px">⚡ Recent Sprints</div>`+sprints.map(s=>`<div class="card card-sm" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div><div style="font-weight:800;font-size:13px">${ops[s.operation]||s.operation} (${s.range_from}–${s.range_to})</div><div style="font-size:11px;color:var(--mu);font-weight:600">${s.date}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--p)">${s.total_time}s</div><div style="font-size:11px;color:var(--g);font-weight:700">${s.accuracy}%</div></div></div>`).join('');
+  el.innerHTML='<div style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p);margin-bottom:10px">⚡ Recent Sprints</div>'+sprints.map(s=>'<div class="card card-sm" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div><div style="font-weight:800;font-size:13px">'+(ops[s.operation]||s.operation)+' ('+s.range_from+'–'+s.range_to+')</div><div style="font-size:11px;color:var(--mu);font-weight:600">'+s.date+'</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--p)">'+s.total_time+'s</div><div style="font-size:11px;color:var(--g);font-weight:700">'+s.accuracy+'%</div></div></div>').join('');
 }
 function resetSprint(){clearInterval(fsTimerInt);document.getElementById('fs-active').style.display='none';document.getElementById('fs-results').style.display='none';document.getElementById('fs-setup').style.display='block';renderSprintHistory();}
 
@@ -1313,7 +1313,7 @@ function showDashTab(tab){
 }
 
 async function renderDashOverview(el){
-  const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
+  const L=appSettings.dashLang==='fr';el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
   try{
     const [sugs,childData]=await Promise.all([sbFetch('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc'),Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}))]);
     const pending=(sugs||[]).filter(s=>s.status==='pending');
@@ -1325,7 +1325,7 @@ async function renderDashOverview(el){
 }
 
 async function renderDashAnalytics(el){
-  const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
+  const L=appSettings.dashLang==='fr';el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
   try{
     const cards=await Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}));
     el.innerHTML=cards.map(({c,sessions})=>{
@@ -1387,7 +1387,7 @@ function showSessionDetail(s){
 
 async function renderDashTopics(el){
   const L=appSettings.dashLang==='fr';
-  el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
+  el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
   try{
     const sugs=await sbFetch('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc')||[];
     el.innerHTML=`<div class="section-title">${L?'Gestion des sujets':'Topic Management'}</div>
@@ -1463,17 +1463,23 @@ async function approveSug(id){await sbFetchSafe('topic_suggestions?id=eq.'+id,{m
 async function rejectSug(id){await sbFetchSafe('topic_suggestions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'rejected'})});toast('❌ Rejected.');showDashTab(currentDashTab);}
 
 async function renderDashSprints(el){
-  const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
+  const L=appSettings.dashLang==='fr';el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
   try{
     const cards=await Promise.all(allChildren.map(async c=>{const sprints=await sbFetchSafe('flash_sprints?child_id=eq.'+c.id+'&order=created_at.desc&limit=10')||[];return{c,sprints};}));
     const ops={add:'Addition',sub:'Subtraction',mul:'Multiplication',div:'Division'};
-    el.innerHTML=`<div class="section-title">⚡ FlashSprint</div>`+cards.map(({c,sprints})=>`<div class="card" style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:26px">${c.mascot}</span><span style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</span></div>${!sprints.length?`<div style="color:var(--mu);font-weight:700;font-size:13px">${L?'Aucun sprint.':'No sprints yet.'}</div>`:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Meilleur':'Best'}</div><div style="font-weight:800;color:var(--p)">${Math.min(...sprints.map(s=>s.total_time))}s</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Moy.':'Avg'}</div><div style="font-weight:800;color:var(--g)">${Math.round(sprints.reduce((a,s)=>a+s.accuracy,0)/sprints.length)}%</div></div></div><table style="width:100%;font-size:11px;border-collapse:collapse"><tr style="background:var(--pl)"><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Date</th><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Op</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">${L?'Temps':'Time'}</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">%</th></tr>${sprints.slice(0,6).map((s,i)=>`<tr style="background:${i%2?'#fff':'#F9F7FF'}"><td style="padding:5px 8px">${s.date}</td><td style="padding:5px 8px;font-weight:700">${ops[s.operation]||s.operation}</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:var(--p)">${s.total_time}s</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:${s.accuracy>=90?'var(--g)':s.accuracy>=70?'#D97706':'var(--r)'}">${s.accuracy}%</td></tr>`).join('')}</table>`}</div>`).join('');
+    let h='<div class="section-title">⚡ FlashSprint</div>';
+    h+=cards.map(({c,sprints})=>{
+      let ch='<div class="card" style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:26px">'+c.mascot+'</span><span style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p)">'+c.name+'</span></div>';
+      if(!sprints.length){ ch+='<div style="color:var(--mu);font-weight:700;font-size:13px">'+(L?'Aucun sprint.':'No sprints yet.')+'</div>'; }
+      else{ ch+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">'+(L?'Meilleur':'Best')+'</div><div style="font-weight:800;color:var(--p)">'+Math.min(...sprints.map(s=>s.total_time))+'s</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">'+(L?'Moy.':'Avg')+'</div><div style="font-weight:800;color:var(--g)">'+Math.round(sprints.reduce((a,s)=>a+s.accuracy,0)/sprints.length)+'%</div></div></div><table style="width:100%;font-size:11px;border-collapse:collapse"><tr style="background:var(--pl)"><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Date</th><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Op</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">'+(L?'Temps':'Time')+'</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">%</th></tr>'+sprints.slice(0,6).map((s,i)=>'<tr style="background:'+(i%2?'#fff':'#F9F7FF')+'"><td style="padding:5px 8px">'+s.date+'</td><td style="padding:5px 8px;font-weight:700">'+(ops[s.operation]||s.operation)+'</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:var(--p)">'+s.total_time+'s</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:'+(s.accuracy>=90?'var(--g)':s.accuracy>=70?'#D97706':'var(--r)')+'">'+s.accuracy+'%</td></tr>').join('')+'</table>'; }
+      ch+='</div>';return ch;
+    }).join('');el.innerHTML=h;
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load sprint data.</div>';}
 }
 
 async function renderDashProfiles(el){
   const L=appSettings.dashLang==='fr';
-  el.innerHTML=`<div class="section-title">${L?'Gestion des profils':'Profiles'}</div>${allChildren.map(c=>`<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:14px 16px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><button class="btn btn-danger btn-sm" onclick="confirmDelete('${c.id}','${c.name}')">🗑</button></div>`).join('')}<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="showAddChild()">+ ${L?'Ajouter un enfant':'Add Child'}</button>`;
+  el.innerHTML='<div class="section-title">'+(L?'Gestion des profils':'Profiles')+'</div>'+allChildren.map(c=>'<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:14px 16px"><span style="font-size:32px">'+c.mascot+'</span><div style="flex:1"><div style="font-family:\'Fredoka One\',cursive;font-size:15px;color:var(--p)">'+c.name+'</div><div style="font-size:11px;font-weight:700;color:var(--mu)">'+c.grade+' • '+c.curriculum+'</div></div><button class="btn btn-danger btn-sm" onclick="confirmDelete(\''+c.id+'\',\''+c.name+'\')">🗑</button></div>').join('')+'<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="showAddChild()">+ '+(L?'Ajouter un enfant':'Add Child')+'</button>';
 }
 function showAddChild(){
   const L=appSettings.dashLang==='fr';
