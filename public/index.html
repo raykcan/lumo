@@ -54,13 +54,13 @@ input:focus,select:focus{border-color:var(--p)}
 .pin-key:hover{background:var(--pl);border-color:var(--p);color:var(--p)}
 .pin-key:active{transform:scale(.95)}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--card);border-bottom:1px solid var(--br);flex-shrink:0}
-.topbar-title{font-family:\\'Fredoka One\\',cursive;font-size:20px;color:var(--p)}
+.topbar-title{font-family:'Fredoka One',cursive;font-size:20px;color:var(--p)}
 .content{flex:1;padding:18px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .tab-bar{display:flex;background:var(--card);border-top:1px solid var(--br);padding:6px 0 2px;flex-shrink:0}
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px;cursor:pointer;border-radius:10px;color:var(--mu);font-size:10px;font-weight:700;transition:all .18s}
 .tab-item.active{color:var(--p)}
 .tab-item .ti{font-size:20px}
-.section-title{font-family:\\'Fredoka One\\',cursive;font-size:19px;color:var(--p);margin-bottom:14px}
+.section-title{font-family:'Fredoka One',cursive;font-size:19px;color:var(--p);margin-bottom:14px}
 .progress-wrap{background:var(--br);border-radius:100px;height:9px;overflow:hidden}
 .progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--p),var(--pm));transition:width .5s ease}
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700}
@@ -91,7 +91,7 @@ input:focus,select:focus{border-color:var(--p)}
 <div id="s-land" class="screen active">
 <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;text-align:center;background:linear-gradient(155deg,#F8F7FF 0%,#EDE9FE 100%);min-height:100vh">
   <div style="font-size:90px;animation:bounce 2s ease-in-out infinite;display:inline-block;margin-bottom:4px">🦉</div>
-  <h1 style="font-family:\\'Fredoka One\\',cursive;font-size:48px;color:var(--p);line-height:1;margin-bottom:6px">Lumo</h1>
+  <h1 style="font-family:'Fredoka One',cursive;font-size:48px;color:var(--p);line-height:1;margin-bottom:6px">Lumo</h1>
   <p style="font-size:16px;color:var(--mu);margin-bottom:36px;font-weight:700">Your smart learning adventure!</p>
   <div id="land-loading" style="color:var(--mu);font-weight:700;font-size:14px;margin-bottom:20px"><span class="spin">⏳</span> Loading...</div>
   <div id="land-btns" class="hidden" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px">
@@ -119,7 +119,7 @@ input:focus,select:focus{border-color:var(--p)}
 <div class="topbar"><button class="btn btn-ghost btn-sm" onclick="go('s-child-select');renderChildSelect()">← Back</button><span class="topbar-title" id="cp-title">Enter PIN</span><div style="width:60px"></div></div>
 <div class="content" style="display:flex;flex-direction:column;align-items:center;padding-top:28px">
   <div id="cp-mascot" style="font-size:72px;margin-bottom:12px;animation:bounce 2s ease-in-out infinite;display:inline-block">🦁</div>
-  <h2 style="font-family:\\'Fredoka One\\',cursive;font-size:24px;color:var(--p);margin-bottom:3px" id="cp-name">Hi Emma!</h2>
+  <h2 style="font-family:'Fredoka One',cursive;font-size:24px;color:var(--p);margin-bottom:3px" id="cp-name">Hi Emma!</h2>
   <p style="color:var(--mu);font-weight:700;font-size:13px;margin-bottom:12px">Enter your secret PIN 🤫</p>
   <div id="cp-err" class="alert alert-err hidden">Wrong PIN — try again!</div>
   <div class="pin-display"><div class="pin-dot" id="cpd0"></div><div class="pin-dot" id="cpd1"></div><div class="pin-dot" id="cpd2"></div><div class="pin-dot" id="cpd3"></div></div>
@@ -137,7 +137,7 @@ input:focus,select:focus{border-color:var(--p)}
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:8px">
     <span id="h-mascot" style="font-size:28px">🦁</span>
-    <div><div style="font-family:\\'Fredoka One\\',cursive;font-size:16px;color:var(--p)" id="h-name">Emma</div><div style="font-size:10px;font-weight:700;color:var(--mu)" id="h-grade">Grade 1</div></div>
+    <div><div style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--p)" id="h-name">Emma</div><div style="font-size:10px;font-weight:700;color:var(--mu)" id="h-grade">Grade 1</div></div>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
     <span style="font-size:14px">⭐</span><span style="font-weight:800;font-size:15px;color:#D97706" id="h-stars">0</span>
@@ -160,7 +160,7 @@ input:focus,select:focus{border-color:var(--p)}
 <div class="content"><div style="max-width:460px;margin:0 auto">
   <div style="text-align:center;margin-bottom:20px">
     <span id="setup-mascot" style="font-size:54px;animation:bounce 2s ease-in-out infinite;display:inline-block">🦁</span>
-    <h2 style="font-family:\\'Fredoka One\\',cursive;font-size:22px;color:var(--p);margin-top:6px">What shall we learn today?</h2>
+    <h2 style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--p);margin-top:6px">What shall we learn today?</h2>
   </div>
   <div class="card" style="margin-bottom:14px">
     <div style="font-weight:800;font-size:13px;margin-bottom:10px">📖 Subject</div>
@@ -262,11 +262,11 @@ input:focus,select:focus{border-color:var(--p)}
   <div style="max-width:420px;width:100%">
     <div style="text-align:center;margin-bottom:20px">
       <span id="res-mascot" style="font-size:72px;display:inline-block;animation:bounce 1.6s ease-in-out infinite">🦁</span>
-      <h2 style="font-family:\\'Fredoka One\\',cursive;font-size:26px;color:var(--p);margin-top:6px" id="res-title">Amazing!</h2>
+      <h2 style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--p);margin-top:6px" id="res-title">Amazing!</h2>
     </div>
     <div class="card" style="background:linear-gradient(135deg,var(--p),var(--pm));color:#fff;padding:24px;margin-bottom:14px;text-align:center">
       <div style="font-size:14px;font-weight:700;opacity:.85;margin-bottom:3px">Your Score</div>
-      <div style="font-family:\\'Fredoka One\\',cursive;font-size:58px;line-height:1" id="res-score">8/10</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:58px;line-height:1" id="res-score">8/10</div>
       <div style="margin-top:6px" id="res-stars"></div>
     </div>
     <div class="card" style="margin-bottom:14px">
@@ -292,7 +292,7 @@ input:focus,select:focus{border-color:var(--p)}
   <div id="fs-setup" style="max-width:400px;margin:0 auto">
     <div style="text-align:center;margin-bottom:20px">
       <span style="font-size:56px;display:inline-block;animation:bounce 2s ease-in-out infinite">⚡</span>
-      <h2 style="font-family:\\'Fredoka One\\',cursive;font-size:22px;color:var(--p);margin-top:6px">Mental Math Sprint!</h2>
+      <h2 style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--p);margin-top:6px">Mental Math Sprint!</h2>
     </div>
     <div class="card" style="margin-bottom:12px">
       <div style="font-weight:800;font-size:13px;margin-bottom:10px">⚙️ Operation</div>
@@ -317,11 +317,11 @@ input:focus,select:focus{border-color:var(--p)}
   <div id="fs-active" style="display:none;max-width:360px;margin:0 auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <span class="badge badge-p">Q <span id="fs-qn">1</span>/<span id="fs-qt">0</span></span>
-      <div style="font-family:\\'Fredoka One\\',cursive;font-size:22px;color:#DC2626" id="fs-timer">0.0s</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:22px;color:#DC2626" id="fs-timer">0.0s</div>
       <span class="badge badge-g" id="fs-correct-badge">✓ 0</span>
     </div>
     <div class="card" style="text-align:center;padding:28px 16px;margin-bottom:14px">
-      <div style="font-family:\\'Fredoka One\\',cursive;font-size:40px;color:var(--tx);margin-bottom:14px" id="fs-q"></div>
+      <div style="font-family:'Fredoka One',cursive;font-size:40px;color:var(--tx);margin-bottom:14px" id="fs-q"></div>
       <input type="number" id="fs-ans" inputmode="numeric" placeholder="?" style="font-size:26px;font-weight:800;text-align:center;max-width:140px;margin:0 auto;display:block" onkeyup="if(event.key==='Enter')submitSprint()">
     </div>
     <button class="btn btn-yellow btn-full btn-lg" onclick="submitSprint()">✓ Submit</button>
@@ -330,11 +330,11 @@ input:focus,select:focus{border-color:var(--p)}
   <div id="fs-results" style="display:none;max-width:400px;margin:0 auto">
     <div style="text-align:center;margin-bottom:20px">
       <span style="font-size:56px">⚡</span>
-      <h2 style="font-family:\\'Fredoka One\\',cursive;font-size:24px;color:var(--p)">Sprint Complete!</h2>
+      <h2 style="font-family:'Fredoka One',cursive;font-size:24px;color:var(--p)">Sprint Complete!</h2>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div class="card card-sm" style="text-align:center"><div style="font-size:11px;color:var(--mu);font-weight:700;margin-bottom:3px">Time</div><div style="font-family:\\'Fredoka One\\',cursive;font-size:26px;color:var(--p)" id="fs-r-time">—</div></div>
-      <div class="card card-sm" style="text-align:center"><div style="font-size:11px;color:var(--mu);font-weight:700;margin-bottom:3px">Accuracy</div><div style="font-family:\\'Fredoka One\\',cursive;font-size:26px;color:var(--g)" id="fs-r-acc">—</div></div>
+      <div class="card card-sm" style="text-align:center"><div style="font-size:11px;color:var(--mu);font-weight:700;margin-bottom:3px">Time</div><div style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--p)" id="fs-r-time">—</div></div>
+      <div class="card card-sm" style="text-align:center"><div style="font-size:11px;color:var(--mu);font-weight:700;margin-bottom:3px">Accuracy</div><div style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--g)" id="fs-r-acc">—</div></div>
     </div>
     <div class="card" style="margin-bottom:14px">
       <div style="font-weight:800;font-size:13px;margin-bottom:10px">Per-question breakdown</div>
@@ -353,7 +353,7 @@ input:focus,select:focus{border-color:var(--p)}
 <div class="topbar"><button class="btn btn-ghost btn-sm" onclick="go('s-land')">← Back</button><span class="topbar-title">🔒 Parent Login</span><div style="width:60px"></div></div>
 <div class="content" style="display:flex;flex-direction:column;align-items:center;padding-top:28px">
   <div class="card" style="width:100%;max-width:340px">
-    <div style="text-align:center;margin-bottom:16px"><span style="font-size:44px">👨‍👩‍👧‍👦</span><h2 style="font-family:\\'Fredoka One\\',cursive;font-size:20px;color:var(--p);margin-top:6px">Parent Dashboard</h2></div>
+    <div style="text-align:center;margin-bottom:16px"><span style="font-size:44px">👨‍👩‍👧‍👦</span><h2 style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--p);margin-top:6px">Parent Dashboard</h2></div>
     <div id="pl-err" class="alert alert-err hidden">Incorrect PIN. Try again.</div>
     <p style="color:var(--mu);font-weight:700;font-size:13px;margin-bottom:6px">Enter your 4-digit PIN:</p>
     <div class="pin-display"><div class="pin-dot" id="ppd0"></div><div class="pin-dot" id="ppd1"></div><div class="pin-dot" id="ppd2"></div><div class="pin-dot" id="ppd3"></div></div>
@@ -371,7 +371,7 @@ input:focus,select:focus{border-color:var(--p)}
 <!-- PARENT DASHBOARD -->
 <div id="s-dash" class="screen">
 <div class="topbar">
-  <div style="font-family:\\'Fredoka One\\',cursive;font-size:19px;color:var(--p)">📊 Dashboard</div>
+  <div style="font-family:'Fredoka One',cursive;font-size:19px;color:var(--p)">📊 Dashboard</div>
   <div style="display:flex;gap:6px">
     <button onclick="toggleDashLang()" style="font-size:11px;padding:5px 10px;background:var(--pl);color:var(--p);border-radius:8px;border:none;font-weight:700;cursor:pointer" id="dl-btn">FR</button>
     <button class="btn btn-ghost btn-sm" onclick="go('s-land')">🚪</button>
@@ -399,7 +399,7 @@ const SB_KEY=' sb_publishable_jknkJ-FqbDUdKjU3UfECnQ_-kxIGhoU;
 const CLAUDE_MODEL='claude-sonnet-4-20250514';
 
 async function sbFetch(path,opts={}){
-  console.log('SB fetch', path); const r=await fetch(SB_URL+'/rest/v1/'+path,{
+  const r=await fetch(SB_URL+'/rest/v1/'+path,{
     headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
     ...opts
   });
@@ -458,17 +458,12 @@ let childMastery={};
 async function sbFetchSafe(path,opts={}){try{return await sbFetch(path,opts);}catch(e){console.error(e);return null;}}
 
 async function init(){
-  document.getElementById('land-loading').innerHTML='<span class="spin">⏳</span> Loading app data…';
-  const timeout=(ms)=>new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms));
   try{
-    const [sets,kids,assigns,masteryRows]=await Promise.race([
-      Promise.all([
-        sbFetch('app_settings?id=eq.global&select=*'),
-        sbFetch('children?select=*&order=created_at.asc'),
-        sbFetchSafe('topic_suggestions?select=*'),
-        sbFetchSafe('topic_mastery?select=*')
-      ]),
-      timeout(4000)
+    const [sets,kids,assigns,masteryRows]=await Promise.all([
+      sbFetch('app_settings?id=eq.global&select=*'),
+      sbFetch('children?select=*&order=created_at.asc'),
+      sbFetchSafe('topic_suggestions?select=*'),
+      sbFetchSafe('topic_mastery?select=*')
     ]);
     if(sets&&sets[0])appSettings={...appSettings,...sets[0]};
     if(kids)allChildren=kids;
@@ -478,13 +473,14 @@ async function init(){
       childTopicAssignments[a.child_id].push({topic:a.topic,subject:a.subject,grade:a.grade});
     });
     childMastery={};
-    (masteryRows||[]).forEach(r=>{ childMastery[`${r.child_id}__${r.subject}__${r.topic}`]=r; });
+    (masteryRows||[]).forEach(r=>{
+      const key=`${r.child_id}__${r.subject}__${r.topic}`;
+      childMastery[key]=r;
+    });
     document.getElementById('land-loading').classList.add('hidden');
     const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
   }catch(e){
-    document.getElementById('land-loading').innerHTML='';
-    const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
-    window.__startupOk=true; window.__startupErr='';
+    document.getElementById('land-loading').innerHTML='<span style="color:var(--r)">⚠️ Connection issue. Please refresh.</span>';
   }
 }
 init();
@@ -502,7 +498,7 @@ function renderChildSelect(){
     <div class="card hov" onclick="selectChild('${c.id}')" style="display:flex;align-items:center;gap:14px;padding:18px;margin-bottom:12px">
       <div style="font-size:44px">${c.mascot}</div>
       <div style="flex:1">
-        <div style="font-family:\\'Fredoka One\\',cursive;font-size:18px;color:var(--p)">${c.name}</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--p)">${c.name}</div>
         <div style="font-size:12px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div>
         <div style="display:flex;align-items:center;gap:4px;margin-top:3px"><span style="font-size:13px">⭐</span><span style="font-weight:800;font-size:13px;color:#D97706">${c.stars}</span></div>
       </div>
@@ -562,15 +558,15 @@ async function renderHomeTab(el){
   const stn=50-(currentChild.stars%50);
   let lastHTML='';
   const sessions=await sbFetchSafe('sessions?child_id=eq.'+currentChild.id+'&order=created_at.desc&limit=1');
-  if(sessions&&sessions[0]){const s=sessions[0];lastHTML=`<div class="card card-sm" style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px">📖 Last Session</div><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:14px">${s.subject}</div><div style="font-size:12px;color:var(--mu);font-weight:600">${s.topic}</div></div><div style="font-family:\\'Fredoka One\\',cursive;font-size:20px;color:var(--p)">${s.score}/10</div></div></div>`;}
+  if(sessions&&sessions[0]){const s=sessions[0];lastHTML=`<div class="card card-sm" style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px">📖 Last Session</div><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:14px">${s.subject}</div><div style="font-size:12px;color:var(--mu);font-weight:600">${s.topic}</div></div><div style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--p)">${s.score}/10</div></div></div>`;}
   el.innerHTML=`
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:64px;animation:bounce 2s ease-in-out infinite;display:inline-block">${currentChild.mascot}</div>
-      <h2 style="font-family:\\'Fredoka One\\',cursive;font-size:26px;color:var(--p)">Hello, ${currentChild.name}! 👋</h2>
+      <h2 style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--p)">Hello, ${currentChild.name}! 👋</h2>
     </div>
     <div class="card" style="background:linear-gradient(135deg,var(--p),var(--pm));color:#fff;padding:18px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div><div style="font-size:12px;font-weight:700;opacity:.8">⭐ Level ${sl}</div><div style="font-family:\\'Fredoka One\\',cursive;font-size:26px">${currentChild.stars} Stars</div></div>
+        <div><div style="font-size:12px;font-weight:700;opacity:.8">⭐ Level ${sl}</div><div style="font-family:'Fredoka One',cursive;font-size:26px">${currentChild.stars} Stars</div></div>
         <div style="text-align:right"><div style="font-size:12px;opacity:.8">${stn} to next!</div><div style="font-size:32px">🏆</div></div>
       </div>
       <div style="background:rgba(255,255,255,.25);border-radius:100px;height:8px"><div style="background:#fff;border-radius:100px;height:8px;width:${pct}%"></div></div>
@@ -622,10 +618,12 @@ async function saveProfileName(){
   toast('Name saved! ✨');
 }
 function openMascotPicker(){
-  showModal('<h3 style="font-family:\'Fredoka One\',cursive;font-size:19px;color:var(--p);margin-bottom:14px">Choose Your Mascot!</h3>'+
-  '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">'+
-    MASCOTS.map(m=>'<div onclick="pickMascot(\''+m.e+'\',this)" style="text-align:center;padding:10px;border-radius:12px;cursor:pointer;border:2px solid '+(currentChild.mascot===m.e?'var(--p)':'var(--br)')+';background:'+(currentChild.mascot===m.e?'var(--pl)':'#fff')+'"><div style="font-size:32px">'+m.e+'</div><div style="font-size:9px;font-weight:700;color:var(--mu);margin-top:2px">'+m.n+'</div></div>').join('')+
-  '</div><button class="btn btn-ghost btn-full" style="margin-top:14px" onclick="hideModal()">Cancel</button>');
+  showModal(`<h3 style="font-family:'Fredoka One',cursive;font-size:19px;color:var(--p);margin-bottom:14px">Choose Your Mascot!</h3>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+    ${MASCOTS.map(m=>`<div onclick="pickMascot('${m.e}',this)" style="text-align:center;padding:10px;border-radius:12px;cursor:pointer;border:2px solid ${currentChild.mascot===m.e?'var(--p)':'var(--br)'};background:${currentChild.mascot===m.e?'var(--pl)':'#fff'}">
+      <div style="font-size:32px">${m.e}</div><div style="font-size:9px;font-weight:700;color:var(--mu);margin-top:2px">${m.n}</div>
+    </div>`).join('')}
+  </div><button class="btn btn-ghost btn-full" style="margin-top:14px" onclick="hideModal()">Cancel</button>`);
 }
 async function pickMascot(emoji){
   currentChild.mascot=emoji;document.getElementById('h-mascot').textContent=emoji;
@@ -1095,7 +1093,7 @@ Type: ${typeInstr}
 Difficulty: ${diff}
 ${cfg.mode === 'exam' ? 'EXAM MODE.' : 'PRACTICE MODE — include hint.'}
 Avoid repeating these recent questions: [${prevQs}]\nUse a fresh angle, different numbers, different phrasing, and different format when possible.\nIf suitable, vary with picture-style, chart-style, graph-style, table-style, or map-style text prompts that can be shown without external images.
-JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B","C","D"],' : ''}"answer":"...","hint":"...","explanation":"..."}. Create varied questions, not near-duplicates.`;
+JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B","C","D"],' : ''}"answer":"...","hint":"...","explanation":"..."}. Create varied questions, not near-duplicates.
   try {
     const raw = await claudeAsk(prompt, sys);
     const parsed = JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g, '').trim());
@@ -1104,11 +1102,11 @@ JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B"
     // Ultimate fallback - return a simple question
     return {
       type: 'mc',
-      text: 'What is an important concept in '+topic+'?',
+      text: `What is an important concept in ${topic}?`,
       opts: ['Review your notes', 'Ask your teacher', topic, 'Study more'],
       answer: topic,
-      hint: 'Think about what you have learned in '+topic+'.',
-      explanation: 'Keep studying '+topic+' — you\'re doing great!',
+      hint: `Think about what you have learned in ${topic}.`,
+      explanation: `Keep studying ${topic} — you're doing great!`,
       topic, lang, examMode: cfg.mode === 'exam', userCorrect: null
     };
   }
@@ -1125,9 +1123,9 @@ function renderQ(q){
   document.getElementById('q-prog').style.width=((sessIdx+1)/cfg.count*100)+'%';
   const subj=SUBJECTS.find(s=>s.id===cfg.subject);
   document.getElementById('q-subj-badge').textContent=(subj?.emoji||'')+' '+(subj?.label||'');
-  document.getElementById('q-lang-badge').textContent=(q.lang==='fr'?'🇫🇷 Français':q.lang==='ar'?'📜 عربي':'🇨🇦 English');
+  document.getElementById('q-lang-badge').textContent=q.lang==='fr'?'🇫🇷 Français':q.lang==='ar'?'📜 عربي':'🇨🇦 English';
   document.getElementById('q-exam-badge').classList.toggle('hidden',!q.examMode);
-  document.getElementById('q-type-badge').textContent=(({mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type)+(q.difficultyLabel?' • '+q.difficultyLabel:''));
+  document.getElementById('q-type-badge').textContent=({mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type)+(q.difficultyLabel?` • ${q.difficultyLabel}`:'');
   document.getElementById('q-text').textContent=q.text;
   document.getElementById('q-text').style.direction=q.lang==='ar'?'rtl':'ltr';
   document.getElementById('q-mc').innerHTML='';
@@ -1191,12 +1189,12 @@ function showFeedback(correct,q){
     const pts=Math.floor(Math.random()*2)+2;sessStars+=pts;document.getElementById('sess-stars').textContent=sessStars;q.starsEarned=pts;
     fc.style.cssText='margin-bottom:10px;border:2px solid var(--g);background:var(--gl)';
     const msgs=q.lang==='fr'?['Excellent travail ! 🌟','Super, c\'est parfait ! ✅','Bravo ! 🎉']:q.lang==='ar'?['ممتاز! 🌟','أحسنت! ✅','رائع! 🎉']:['Great job! 🌟','Excellent! ✅','Brilliant! 🎉'];
-    ft.innerHTML='<span style="color:#065F46;font-weight:800">'+msgs[Math.floor(Math.random()*msgs.length)]+' (+'+pts+' ⭐)</span>'+(q.explanation?'<div style="margin-top:6px;font-size:13px;color:#065F46">'+q.explanation+'</div>':'');
+    ft.innerHTML=`<span style="color:#065F46;font-weight:800">${msgs[Math.floor(Math.random()*msgs.length)]} (+${pts} ⭐)</span>${q.explanation?`<div style="margin-top:6px;font-size:13px;color:#065F46">${q.explanation}</div>`:''}`;
     mascot.style.transform='scale(1.15) rotate(4deg)';setTimeout(()=>mascot.style.transform='',400);
   }else{
     fc.style.cssText='margin-bottom:10px;border:2px solid #FCA5A5;background:#FEF2F2';
     const near=q.lang==='fr'?'Presque ! 💪':q.lang==='ar'?'تقريباً! 💪':'Almost! 💪';
-    ft.innerHTML='<div style="color:#991B1B;font-weight:800;margin-bottom:5px">'+near+'</div><div style="color:#991B1B;margin-bottom:4px">✏️ Correct answer: <strong>'+q.answer+'</strong></div><div style="color:var(--p);font-size:13px">💡 '+(q.explanation||q.hint||'')+'</div>';
+    ft.innerHTML=`<div style="color:#991B1B;font-weight:800;margin-bottom:5px">${near}</div><div style="color:#991B1B;margin-bottom:4px">✏️ Correct answer: <strong>${q.answer}</strong></div><div style="color:var(--p);font-size:13px">💡 ${q.explanation||q.hint||''}</div>`;
   }
   fc.classList.remove('hidden');
 }
@@ -1216,13 +1214,13 @@ async function endSession(){
   document.getElementById('res-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('res-score').textContent=score+'/10';
   document.getElementById('res-title').textContent=score>=9?'Incredible! 🏆':score>=7?'Great Work! 🌟':score>=5?'Good Effort! 💪':'Keep Practicing! 🎯';
-  document.getElementById('res-stars').innerHTML='⭐'.repeat(Math.min(totalStars,12))+'<div style="font-size:13px;opacity:.85;margin-top:3px">+'+totalStars+' stars!</div>';
-  document.getElementById('res-breakdown').innerHTML=sessionQs.map((q,i)=>'<div style="display:flex;align-items:flex-start;gap:8px;padding:7px;border-radius:9px;background:'+(q.userCorrect?'var(--gl)':'var(--rl)')+';margin-bottom:5px"><span>'+(q.userCorrect?'✅':'❌')+'</span><span style="font-size:12px;font-weight:700;color:'+(q.userCorrect?'#065F46':'#991B1B')+'">'+q.text.slice(0,60)+(q.text.length>60?'...':'')+'</span></div>').join('');
+  document.getElementById('res-stars').innerHTML='⭐'.repeat(Math.min(totalStars,12))+`<div style="font-size:13px;opacity:.85;margin-top:3px">+${totalStars} stars!</div>`;
+  document.getElementById('res-breakdown').innerHTML=sessionQs.map((q,i)=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:7px;border-radius:9px;background:${q.userCorrect?'var(--gl)':'var(--rl)'};margin-bottom:5px"><span>${q.userCorrect?'✅':'❌'}</span><span style="font-size:12px;font-weight:700;color:${q.userCorrect?'#065F46':'#991B1B'}">${q.text.slice(0,60)}${q.text.length>60?'...':''}</span></div>`).join('');
   const wrong=sessionQs.filter(q=>!q.userCorrect);
-  document.getElementById('res-review').innerHTML=wrong.length===0?'<div style="color:var(--g);font-weight:700">🎉 Perfect score!</div>':wrong.map(q=>'<div style="padding:10px;border-radius:10px;background:#FEF2F2;border-left:3px solid var(--r);margin-bottom:8px"><div style="font-weight:800;font-size:12px;color:#991B1B;margin-bottom:3px">'+q.text+'</div><div style="font-size:12px;color:var(--p)">✓ '+q.answer+'</div>'+(q.explanation?'<div style="font-size:11px;color:var(--mu);margin-top:2px">💡 '+q.explanation+'</div>':'')+'</div>').join('');
+  document.getElementById('res-review').innerHTML=wrong.length===0?'<div style="color:var(--g);font-weight:700">🎉 Perfect score!</div>':wrong.map(q=>`<div style="padding:10px;border-radius:10px;background:#FEF2F2;border-left:3px solid var(--r);margin-bottom:8px"><div style="font-weight:800;font-size:12px;color:#991B1B;margin-bottom:3px">${q.text}</div><div style="font-size:12px;color:var(--p)">✓ ${q.answer}</div>${q.explanation?`<div style="font-size:11px;color:var(--mu);margin-top:2px">💡 ${q.explanation}</div>`:''}</div>`).join('');
   go('s-results');
 }
-function confirmEnd(){showModal('<h3 style="font-family:\'Fredoka One\',cursive;font-size:19px;color:var(--p);margin-bottom:8px">End Session?</h3><p style="color:var(--mu);font-weight:700;font-size:13px;margin-bottom:18px">Progress won\'t be saved if you leave now.</p><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Keep Going!</button><button class="btn btn-danger" style="flex:1" onclick="hideModal();goHome()">End Session</button></div>');}
+function confirmEnd(){showModal(`<h3 style="font-family:'Fredoka One',cursive;font-size:19px;color:var(--p);margin-bottom:8px">End Session?</h3><p style="color:var(--mu);font-weight:700;font-size:13px;margin-bottom:18px">Progress won't be saved if you leave now.</p><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Keep Going!</button><button class="btn btn-danger" style="flex:1" onclick="hideModal();goHome()">End Session</button></div>`);}
 
 // FLASHSPRINT
 function setFsOp(op){
@@ -1234,10 +1232,10 @@ function genSprintQs(op,from,to){
   const qs=[];
   for(let a=from;a<=to;a++){for(let b2=from;b2<=to;b2++){
     let q,ans;
-    if(op==='add'){q=a+' + '+b2+' = ?';ans=a+b2;}
-    else if(op==='sub'&&a>=b2){q=a+' − '+b2+' = ?';ans=a-b2;}
-    else if(op==='mul'){q=a+' × '+b2+' = ?';ans=a*b2;}
-    else if(op==='div'&&b2!==0&&(a*b2)<=200){q=(a*b2)+' ÷ '+b2+' = ?';ans=a;}
+    if(op==='add'){q=`${a} + ${b2} = ?`;ans=a+b2;}
+    else if(op==='sub'&&a>=b2){q=`${a} − ${b2} = ?`;ans=a-b2;}
+    else if(op==='mul'){q=`${a} × ${b2} = ?`;ans=a*b2;}
+    else if(op==='div'&&b2!==0&&(a*b2)<=200){q=`${a*b2} ÷ ${b2} = ?`;ans=a;}
     if(q!==undefined)qs.push({q,ans});
   }}
   return qs.sort(()=>Math.random()-.5);
@@ -1275,7 +1273,7 @@ async function endSprint(){
   const t=((Date.now()-fsStart)/1000).toFixed(1);const correct=fsAnswers.filter(a=>a.correct).length;const acc=Math.round(correct/fsAnswers.length*100);
   document.getElementById('fs-active').style.display='none';document.getElementById('fs-results').style.display='block';
   document.getElementById('fs-r-time').textContent=t+'s';document.getElementById('fs-r-acc').textContent=acc+'%';
-  document.getElementById('fs-r-bd').innerHTML=fsAnswers.map(a=>'<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;background:'+(a.correct?'var(--gl)':'var(--rl)')+'"><span style="font-size:13px">'+(a.correct?'✅':'❌')+'</span><span style="font-size:12px;font-weight:700;flex:1;color:'+(a.correct?'#065F46':'#991B1B')+'">'+a.q+' '+a.ans+'</span>'+(!a.correct?'<span style="font-size:11px;color:#991B1B">You: '+a.user+'</span>':'')+'</div>').join('');
+  document.getElementById('fs-r-bd').innerHTML=fsAnswers.map(a=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;background:${a.correct?'var(--gl)':'var(--rl)'}"><span style="font-size:13px">${a.correct?'✅':'❌'}</span><span style="font-size:12px;font-weight:700;flex:1;color:${a.correct?'#065F46':'#991B1B'}">${a.q} ${a.ans}</span>${!a.correct?`<span style="font-size:11px;color:#991B1B">You: ${a.user}</span>`:''}</div>`).join('');
   if(currentChild){
     currentChild.stars+=Math.floor(acc/20);document.getElementById('h-stars').textContent=currentChild.stars;
     await sbFetchSafe('children?id=eq.'+currentChild.id,{method:'PATCH',body:JSON.stringify({stars:currentChild.stars})});
@@ -1291,7 +1289,7 @@ async function renderSprintHistory(){
   const sprints=await sbFetchSafe('flash_sprints?child_id=eq.'+currentChild.id+'&order=created_at.desc&limit=4');
   if(!sprints||!sprints.length){el.innerHTML='';return;}
   const ops={add:'Add',sub:'Sub',mul:'Mul',div:'Div'};
-  el.innerHTML='<div style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p);margin-bottom:10px">⚡ Recent Sprints</div>'+sprints.map(s=>'<div class="card card-sm" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div><div style="font-weight:800;font-size:13px">'+(ops[s.operation]||s.operation)+' ('+s.range_from+'–'+s.range_to+')</div><div style="font-size:11px;color:var(--mu);font-weight:600">'+s.date+'</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--p)">'+s.total_time+'s</div><div style="font-size:11px;color:var(--g);font-weight:700">'+s.accuracy+'%</div></div></div>').join('');
+  el.innerHTML=`<div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p);margin-bottom:10px">⚡ Recent Sprints</div>`+sprints.map(s=>`<div class="card card-sm" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div><div style="font-weight:800;font-size:13px">${ops[s.operation]||s.operation} (${s.range_from}–${s.range_to})</div><div style="font-size:11px;color:var(--mu);font-weight:600">${s.date}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--p)">${s.total_time}s</div><div style="font-size:11px;color:var(--g);font-weight:700">${s.accuracy}%</div></div></div>`).join('');
 }
 function resetSprint(){clearInterval(fsTimerInt);document.getElementById('fs-active').style.display='none';document.getElementById('fs-results').style.display='none';document.getElementById('fs-setup').style.display='block';renderSprintHistory();}
 
@@ -1313,44 +1311,35 @@ function showDashTab(tab){
 }
 
 async function renderDashOverview(el){
-  const L=appSettings.dashLang==='fr';el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
+  const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
     const [sugs,childData]=await Promise.all([sbFetch('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc'),Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}))]);
     const pending=(sugs||[]).filter(s=>s.status==='pending');
-    let h='';
-    if(pending.length){ 
-      h+='<div style="background:var(--yl);border:1px solid #FCD34D;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:800;font-size:13px;color:#92400E;margin-bottom:8px">🔔 '+pending.length+' '+(L?'suggestion(s)':'pending suggestion(s)')+'</div>';
-      h+=pending.map(s=>'<div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:7px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">'+(s.children?.name||'') +': '+s.text+'</div><div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" onclick="approveS(\''+s.id+'\')">✓ '+(L?'Approuver':'Approve')+'</button><button class="btn btn-sm btn-danger" onclick="rejectS(\''+s.id+'\')">✗ '+(L?'Rejeter':'Reject')+'</button></div></div>').join('');
-      h+='</div>'; 
-    }
-    h+='<div class="section-title">'+(L?'Résumé':'Overview')+'</div>';
-    h+=childData.map(({c,sessions})=>{
-      const avg=sessions.length?Math.round(sessions.reduce((a,s)=>a+s.score,0)/sessions.length*10)/10:0;
-      const last=sessions[0];
-      let card='<div class="card hov" style="margin-bottom:12px" onclick="showDashTab(\'analytics\')"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:32px">'+c.mascot+'</span><div style="flex:1"><div style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p)">'+c.name+'</div><div style="font-size:11px;font-weight:700;color:var(--mu)">'+c.grade+' • '+c.curriculum+'</div></div><span style="font-weight:800;color:#D97706;font-size:15px">⭐'+c.stars+'</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Sessions</div><div style="font-weight:800;color:var(--p)">'+sessions.length+'</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">'+(L?'Moy.':'Avg')+'</div><div style="font-weight:800;color:var(--g)">'+avg+'/10</div></div><div style="text-align:center;background:var(--yl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Badges</div><div style="font-weight:800;color:#D97706">'+(c.badges||[]).filter(b=>b.earned).length+'</div></div></div>';
-      if(last) card+='<div style="margin-top:8px;font-size:11px;color:var(--mu);font-weight:600">Last: '+last.date+' — '+last.subject+' '+last.score+'/10</div>';
-      card+='</div>';
-      return card;
-    }).join('');
-    el.innerHTML=h;
+    el.innerHTML=`
+      ${pending.length?`<div style="background:var(--yl);border:1px solid #FCD34D;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:800;font-size:13px;color:#92400E;margin-bottom:8px">🔔 ${pending.length} ${L?'suggestion(s)':'pending suggestion(s)'}</div>${pending.map(s=>`<div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:7px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">${s.children?.name||''}: ${s.text}</div><div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" onclick="approveS('${s.id}')">✓ ${L?'Approuver':'Approve'}</button><button class="btn btn-sm btn-danger" onclick="rejectS('${s.id}')">✗ ${L?'Rejeter':'Reject'}</button></div></div>`).join('')}</div>`:''}
+      <div class="section-title">${L?'Résumé':'Overview'}</div>
+      ${childData.map(({c,sessions})=>{const avg=sessions.length?Math.round(sessions.reduce((a,s)=>a+s.score,0)/sessions.length*10)/10:0;const last=sessions[0];return`<div class="card hov" style="margin-bottom:12px" onclick="showDashTab('analytics')"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><span style="font-weight:800;color:#D97706;font-size:15px">⭐${c.stars}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Sessions</div><div style="font-weight:800;color:var(--p)">${sessions.length}</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Moy.':'Avg'}</div><div style="font-weight:800;color:var(--g)">${avg}/10</div></div><div style="text-align:center;background:var(--yl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Badges</div><div style="font-weight:800;color:#D97706">${(c.badges||[]).filter(b=>b.earned).length}</div></div></div>${last?`<div style="margin-top:8px;font-size:11px;color:var(--mu);font-weight:600">Last: ${last.date} — ${last.subject} ${last.score}/10</div>`:''}</div>`;}).join('')}`;
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load data.</div>';}
 }
 
 async function renderDashAnalytics(el){
-  const L=appSettings.dashLang==='fr';el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
+  const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
     const cards=await Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}));
     el.innerHTML=cards.map(({c,sessions})=>{
       const bySubj={};sessions.forEach(s=>{if(!bySubj[s.subject])bySubj[s.subject]=[];bySubj[s.subject].push(s.score);});
-      let h='<div class="card" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:26px">'+c.mascot+'</span><span style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p)">'+c.name+'</span></div>';
-      h+='<div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">'+(L?'Score par matière':'Score by Subject')+'</div>';
-      h+=Object.entries(bySubj).map(([subj,scores])=>{const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*10)/10;return'<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:800;color:var(--tx)">'+subj+'</span><span style="font-size:12px;font-weight:800;color:'+(avg>=8?'var(--g)':avg>=5?'#D97706':'var(--r)')+'">'+avg+'/10 avg</span></div><div class="prog"><div class="prog-bar" style="background:'+(avg>=8?'var(--g)':avg>=5?'#D97706':'var(--r)')+';width:'+(avg/10*100)+'%"></div></div></div>';}).join('');
-      h+='<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">'+(L?'Performance par type':'Performance by Question Type')+'</div>';
-      h+=(()=>{const qt={};sessions.forEach(s=>{try{const w=JSON.parse(s.wrong_questions||'[]');w.forEach(q=>{const t=q.type||'mc';qt[t]=(qt[t]||{wrong:0,total:0});qt[t].wrong++;qt[t].total++;});const correctT=Math.max(0,(s.score||0));const dummies=['mc','mc','input','tf'];for(let i=0;i<correctT;i++){const t=dummies[i%dummies.length];qt[t]=(qt[t]||{wrong:0,total:0});qt[t].total++;}}catch(e){}});return Object.entries(qt).map(([type,data])=>{const acc=Math.round((data.total-data.wrong)/data.total*100);const tName={mc:'Multiple Choice',tf:'True/False',input:'Short Answer'}[type]||type;return'<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:4px;color:var(--tx)"><span>'+tName+'</span><span style="color:'+(acc>=80?'var(--g)':acc>=50?'#D97706':'var(--r)')+'">'+acc+'%</span></div>';}).join('');})();
-      h+='<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">'+(L?'Journal':'Session Log')+'</div><div style="overflow-x:auto"><table style="width:100%;font-size:11px;border-collapse:collapse"><tr style="background:var(--pl)"><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Date</th><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Subj/Topic</th><th style="padding:5px 8px;text-align:right;color:var(--p);font-weight:700">Score</th></tr>';
-      h+=sessions.slice(0,10).map((s,i)=>'<tr onclick="showSessionDetail('+JSON.stringify(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;')+')" style="background:'+(i%2?'#fff':'#F9F7FF')+';cursor:pointer;transition:background .15s" onmouseenter="this.style.background=\'var(--pl)\'" onmouseleave="this.style.background=\''+(i%2?'#fff':'#F9F7FF')+'\'"><td style="padding:6px">'+s.date+'</td><td style="padding:6px;font-weight:700">'+s.subject+'<div style="font-size:9px;color:var(--mu);font-weight:600;margin-top:2px">'+s.topic+'</div></td><td style="padding:6px;text-align:right;font-weight:800;color:'+(s.score>=8?'var(--g)':s.score>=5?'#D97706':'var(--r)')+'">'+s.score+'/'+s.total+'</td></tr>').join('');
-      h+='</table></div></div>';return h;
-    }).join('');
+      return`<div class="card" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:26px">${c.mascot}</span><span style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</span></div>
+      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Score par matière':'Score by Subject'}</div>
+      ${Object.entries(bySubj).map(([subj,scores])=>{const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*10)/10;return`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;font-weight:700">${subj}</span><span style="font-size:12px;font-weight:800;color:var(--p)">${avg}/10</span></div><div class="progress-wrap"><div class="progress-fill" style="width:${avg/10*100}%"></div></div></div>`;}).join('')}
+      <div class="divider"></div>
+      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Performance par type':'Performance by Question Type'}</div>
+      ${(()=>{const qt={};sessions.forEach(s=>{try{const w=JSON.parse(s.wrong_questions||'[]');w.forEach(q=>{const t=q.type||'mc';qt[t]=(qt[t]||{wrong:0,total:0});qt[t].wrong++;qt[t].total++;});const correctT=Math.max(0,(s.score||0));const dummies=['mc','mc','input','tf'];for(let i=0;i<correctT;i++){const t=dummies[i%dummies.length];qt[t]=(qt[t]||{wrong:0,total:0});qt[t].total++;}}catch(e){}});const labels={'mc':L?'Choix multiple':'Multiple Choice','input':L?'Réponse courte':'Short Answer','tf':'True / False'};return Object.keys(qt).length?Object.entries(qt).map(([t,d])=>{const acc=d.total?Math.round((1-(d.wrong/d.total))*100):100;const label=labels[t]||t;return`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;font-weight:700">${label}</span><span style="font-size:12px;font-weight:800;color:${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}">${acc}%</span></div><div class="progress-wrap"><div class="progress-fill" style="width:${acc}%;background:${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}"></div></div></div>`;}).join(''):'<div style="font-size:12px;color:var(--mu);font-weight:700">No data yet.</div>';})()}
+      <div class="divider"></div>
+      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Journal':'Session Log'}</div>
+      <div style="overflow-x:auto"><table style="width:100%;font-size:11px;border-collapse:collapse">
+        <tr style="background:var(--pl)"><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Date</th><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">${L?'Matière':'Subject'}</th><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">${L?'Sujet':'Topic'}</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">Score</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">Min</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">View</th></tr>
+        ${sessions.slice(0,10).map((s,i)=>`<tr onclick="showSessionDetail(${JSON.stringify(s).replace(/"/g,'&quot;')})" style="background:${i%2?'#fff':'#F9F7FF'};cursor:pointer;transition:background .15s" onmouseenter="this.style.background='var(--pl)'" onmouseleave="this.style.background='${i%2?'#fff':'#F9F7FF'}'"><td style="padding:5px 8px">${s.date}</td><td style="padding:5px 8px;font-weight:700">${s.subject}</td><td style="padding:5px 8px;color:var(--mu)">${s.topic}</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:${s.score>=8?'var(--g)':s.score>=6?'#D97706':'var(--r)'}">${s.score}/10</td><td style="padding:5px 8px;text-align:center;color:var(--mu)">${s.duration}</td><td style="padding:5px 8px;text-align:center;color:var(--mu);font-size:10px">👁</td></tr>`).join('')}
+      </table></div></div>`;}).join('');
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load analytics.</div>';}
 }
 
@@ -1360,64 +1349,72 @@ function showSessionDetail(s){
   const totalQ=s.total||10;
   const wrongCount=Math.max(0,totalQ-goodCount);
   const hasDetailed=wrong.some(w=>w && (w.text||w.answer||w.userAnswer||w.explanation));
-  let body='';
-  body += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
-  body += '<div style="flex:1">';
-  body += '<div style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p)">'+(s.subject||'')+' — '+(s.topic||'')+'</div>';
-  body += '<div style="font-size:11px;color:var(--mu);font-weight:700">'+(s.date||'')+' • '+(s.duration||'')+'min • '+(s.mode||'practice')+' mode</div>';
-  body += '</div>';
-  body += '<div style="font-family:\\'Fredoka One\\',cursive;font-size:26px;color:'+(goodCount>=8?'var(--g)':goodCount>=6?'#D97706':'var(--r)')+'">'+goodCount+'/'+totalQ+'</div>';
-  body += '</div>';
-  body += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">';
-  body += '<div class="card card-sm" style="text-align:center;background:var(--gl)"><div style="font-size:10px;font-weight:700;color:var(--mu)">✅ Correct</div><div style="font-family:\\'Fredoka One\\',cursive;font-size:22px;color:var(--g)">'+goodCount+'</div></div>';
-  body += '<div class="card card-sm" style="text-align:center;background:var(--rl)"><div style="font-size:10px;font-weight:700;color:var(--mu)">❌ Mistakes</div><div style="font-family:\\'Fredoka One\\',cursive;font-size:22px;color:var(--r)">'+wrongCount+'</div></div>';
-  body += '</div>';
-  if(wrong.length && hasDetailed){
-    body += '<div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">❌ Wrong Answers Review</div>';
-    body += '<div style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto">';
-    wrong.forEach((w,i)=>{
-      body += '<div style="background:var(--rl);border-radius:11px;padding:11px 13px">';
-      body += '<div style="font-size:12px;font-weight:800;margin-bottom:5px;color:var(--tx)">Q'+(i+1)+': '+(w.text||'Question not saved')+'</div>';
-      body += '<div style="font-size:11px;color:#991B1B;font-weight:700;margin-bottom:2px">Your answer: '+String(w.userAnswer ?? '—')+'</div>';
-      body += '<div style="font-size:11px;color:var(--g);font-weight:800;margin-bottom:2px">✓ Correct: '+String(w.answer ?? '—')+'</div>';
-      if(w.explanation) body += '<div style="font-size:11px;color:var(--mu);margin-top:4px;line-height:1.45">'+w.explanation+'</div>';
-      body += '</div>';
-    });
-    body += '</div>';
-  } else if(wrong.length){
-    body += '<div style="background:var(--yl);border-radius:12px;padding:12px 14px;font-size:12px;font-weight:700;color:#92400E;line-height:1.45">Detailed wrong-answer content was not saved for this older session. New sessions will now store the question, the child's answer, and the correct answer.</div>';
-  } else {
-    body += '<div style="text-align:center;padding:16px;font-weight:700;color:var(--g);font-size:14px">🌟 Perfect session — no mistakes!</div>';
-  }
-  body += '<button class="btn btn-primary btn-full" style="margin-top:14px" onclick="hideModal()">Close</button>';
-  showModal(body);
+  const html=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="flex:1">
+        <div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${s.subject||''} — ${s.topic||''}</div>
+        <div style="font-size:11px;color:var(--mu);font-weight:700">${s.date||''} • ${s.duration||''}min • ${s.mode||'practice'} mode</div>
+      </div>
+      <div style="font-family:'Fredoka One',cursive;font-size:26px;color:${goodCount>=8?'var(--g)':goodCount>=6?'#D97706':'var(--r)'}">${goodCount}/${totalQ}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div class="card card-sm" style="text-align:center;background:var(--gl)">
+        <div style="font-size:10px;font-weight:700;color:var(--mu)">✅ Correct</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g)">${goodCount}</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;background:var(--rl)">
+        <div style="font-size:10px;font-weight:700;color:var(--mu)">❌ Mistakes</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--r)">${wrongCount}</div>
+      </div>
+    </div>
+    ${wrong.length && hasDetailed ? `
+      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">❌ Wrong Answers Review</div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto">
+        ${wrong.map((w,i)=>`
+          <div style="background:var(--rl);border-radius:11px;padding:11px 13px">
+            <div style="font-size:12px;font-weight:800;margin-bottom:5px;color:var(--tx)">Q${i+1}: ${w.text||'Question not saved'}</div>
+            <div style="font-size:11px;color:#991B1B;font-weight:700;margin-bottom:2px">Your answer: ${String(w.userAnswer ?? '—') || '—'}</div>
+            <div style="font-size:11px;color:var(--g);font-weight:800;margin-bottom:2px">✓ Correct: ${String(w.answer ?? '—') || '—'}</div>
+            ${w.explanation?`<div style="font-size:11px;color:var(--mu);margin-top:4px;line-height:1.45">${w.explanation}</div>`:''}
+          </div>`).join('')}
+      </div>
+    ` : wrong.length ? `
+      <div style="background:var(--yl);border-radius:12px;padding:12px 14px;font-size:12px;font-weight:700;color:#92400E;line-height:1.45">
+        Detailed wrong-answer content was not saved for this older session. New sessions will now store the question, the child's answer, and the correct answer.
+      </div>
+    ` : `
+      <div style="text-align:center;padding:16px;font-weight:700;color:var(--g);font-size:14px">🌟 Perfect session — no mistakes!</div>
+    `}
+    <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="hideModal()">Close</button>
+  `;
+  showModal(html);
 }
 
 
 async function renderDashTopics(el){
   const L=appSettings.dashLang==='fr';
-  el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
+  el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
     const sugs=await sbFetch('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc')||[];
-    let h='<div class="section-title">'+(L?'Gestion des sujets':'Topic Management')+'</div>';
-    h+='<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🔔 '+(L?'Suggestions en attente':'Pending Suggestions')+'</div>';
-    if(!sugs.length){
-      h+='<div style="color:var(--mu);font-weight:700;font-size:13px">'+(L?'Aucune suggestion.':'No suggestions yet.')+'</div>';
-    }else{
-      h+=sugs.map(s=>{
-        let c='<div style="background:'+(s.status==='approved'?'var(--gl)':s.status==='rejected'?'var(--rl)':'var(--yl)')+';border-radius:11px;padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span>'+(s.children?.mascot||'🦁')+'</span><span style="font-weight:800;font-size:12px">'+(s.children?.name||'')+'</span><span class="badge '+(s.status==='approved'?'badge-g':s.status==='rejected'?'badge-r':'badge-y')+'">'+s.status+'</span></div><div style="font-size:13px;font-weight:700;margin-bottom:5px">'+s.topic+'</div><div style="font-size:11px;color:var(--mu);font-weight:600;margin-bottom:8px">'+(s.rationale||'')+'</div>';
-        if(s.status==='pending'){
-          c+='<div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" style="flex:1" onclick="approveSug(\''+s.id+'\')">✓ '+(L?'Approuver':'Approve')+'</button><button class="btn btn-danger btn-sm" style="flex:1" onclick="rejectSug(\''+s.id+'\')">✗ '+(L?'Rejeter':'Reject')+'</button></div>';
-        }
-        c+='</div>';return c;
-      }).join('');
-    }
-    h+='</div>';
-    h+='<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">📚 '+(L?'Naviguer et ajouter des sujets':'Browse & Add Topics')+'</div>';
-    h+='<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><input id="topic-search" type="text" placeholder="'+(L?'Rechercher un sujet…':'Search topics…')+'" oninput="filterCurriculumTopics()" style="flex:1;min-width:160px;font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none"></div>';
-    h+='<div id="curr-topics" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto"></div></div>';
-    el.innerHTML=h;
-    setTimeout(renderCurriculumTopics,50);
+    el.innerHTML=`<div class="section-title">${L?'Gestion des sujets':'Topic Management'}</div>
+    <div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🔔 ${L?'Suggestions en attente':'Pending Suggestions'}</div>
+    ${!sugs.length?`<div style="color:var(--mu);font-weight:700;font-size:13px">${L?'Aucune suggestion.':'No suggestions yet.'}</div>`:sugs.map(s=>`<div style="background:${s.status==='approved'?'var(--gl)':s.status==='rejected'?'var(--rl)':'var(--yl)'};border-radius:11px;padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span>${s.children?.mascot||'🦁'}</span><span style="font-weight:800;font-size:12px">${s.children?.name||''}</span><span class="badge ${s.status==='approved'?'badge-g':s.status==='rejected'?'badge-r':'badge-y'}">${s.status}</span></div><div style="font-size:13px;font-weight:700;margin-bottom:5px">${s.topic}</div><div style="font-size:11px;color:var(--mu);font-weight:600;margin-bottom:8px">${s.rationale||''}</div>${s.status==='pending'?`<div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" style="flex:1" onclick="approveSug('${s.id}')">✓ ${L?'Approuver':'Approve'}</button><button class="btn btn-danger btn-sm" style="flex:1" onclick="rejectSug('${s.id}')">✗ ${L?'Rejeter':'Reject'}</button></div>`:''}</div>`).join('')}
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-weight:800;font-size:14px;margin-bottom:10px">📚 ${L?'Naviguer et ajouter des sujets':'Browse & Add Topics'}</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <input id="topic-search" type="text" placeholder="${L?'Rechercher un sujet…':'Search topics…'}" oninput="filterCurriculumTopics()" style="flex:1;min-width:160px;font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none">
+        <select id="topic-child-sel" onchange="filterCurriculumTopics()" style="font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none">
+          <option value="">${L?'Tout enfant':'All children'}</option>
+          ${allChildren.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
+        </select>
+        <select id="topic-grade-sel" onchange="filterCurriculumTopics()" style="font-size:13px;padding:8px 12px;border:2px solid var(--br);border-radius:10px;outline:none">
+          <option value="">${L?'Toutes les années':'All Grades'}</option>
+          ${['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6'].map(g=>`<option value="${g}">${g}</option>`).join('')}
+        </select>
+      </div>
+      <div id="curriculum-topic-list" style="display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto"></div>
+    </div>`;
     filterCurriculumTopics();
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load topics.</div>';}
 }
@@ -1439,62 +1436,62 @@ function filterCurriculumTopics(){
       });
     });
   });
-  if(!results.length){container.innerHTML='<div style="color:var(--mu);font-weight:700;font-size:13px;text-align:center;padding:16px">'+(L?'Aucun sujet trouvé.':'No topics found.')+'</div>';return;}
-  container.innerHTML=results.slice(0,60).map(r=>{
-    let html='<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--br);background:#fff"><div style="flex:1"><div style="font-size:12px;font-weight:800;color:var(--p)">'+r.topic+'</div><div style="font-size:10px;color:var(--mu);font-weight:600">'+r.subjLabel+' • '+r.grade+'</div></div><div style="display:flex;gap:5px;flex-shrink:0">';
-    html+=allChildren.map(c=>'<button class="btn btn-sm btn-secondary" style="font-size:10px;padding:5px 8px" onclick="confirmAssignTopic(\''+c.id+'\',\''+c.name+'\',\''+r.topic+'\',\''+r.subjLabel+'\',\''+r.grade+'\')">+ '+c.mascot+'</button>').join('');
-    html+='</div></div>';
-    return html;
-  }).join('')+(results.length>60?'<div style="text-align:center;color:var(--mu);font-size:11px;font-weight:700;padding:8px">Refine your search to see more results ('+results.length+' total)</div>':'');
+  if(!results.length){container.innerHTML=`<div style="color:var(--mu);font-weight:700;font-size:13px;text-align:center;padding:16px">${L?'Aucun sujet trouvé.':'No topics found.'}</div>`;return;}
+  container.innerHTML=results.slice(0,60).map(r=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--br);background:#fff">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:800;color:var(--p)">${r.topic}</div>
+        <div style="font-size:10px;color:var(--mu);font-weight:600">${r.subjLabel} • ${r.grade}</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        ${allChildren.map(c=>`<button class="btn btn-sm" style="font-size:10px;padding:4px 8px;background:var(--pl);color:var(--p);border:none;border-radius:7px" onclick="assignTopicToChild('${c.id}','${c.name}','${r.topic}','${r.subjLabel}','${r.grade}')" title="Add to ${c.name}">${c.mascot}</button>`).join('')}
+      </div>
+    </div>`).join('')+(results.length>60?`<div style="text-align:center;color:var(--mu);font-size:11px;font-weight:700;padding:8px">Refine your search to see more results (${results.length} total)</div>`:'');
 }
 function assignTopicToChild(childId,childName,topic,subject,grade){
-  showModal('<h3 style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p);margin-bottom:8px">📌 Assign Topic</h3>'+
-    '<p style="font-size:13px;font-weight:700;margin-bottom:4px">Add <strong>'+topic+'</strong> to <strong>'+childName+'</strong>?</p>'+
-    '<p style="font-size:12px;color:var(--mu);font-weight:600;margin-bottom:16px">'+subject+' • '+grade+'</p>'+
-    '<div style="display:flex;gap:8px">'+
-      '<button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button>'+
-      '<button class="btn btn-primary" style="flex:1" onclick="confirmAssignTopic(\''+childId+'\',\''+childName+'\',\''+topic+'\',\''+subject+'\',\''+grade+'\')">✓ Assign</button>'+
-    '</div>');
+  showModal(`
+    <h3 style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p);margin-bottom:8px">📌 Assign Topic</h3>
+    <p style="font-size:13px;font-weight:700;margin-bottom:4px">Add <strong>${topic}</strong> to <strong>${childName}</strong>?</p>
+    <p style="font-size:12px;color:var(--mu);font-weight:600;margin-bottom:16px">${subject} • ${grade}</p>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmAssignTopic('${childId}','${childName}','${topic}','${subject}','${grade}')">✓ Assign</button>
+    </div>`);
 }
 async function confirmAssignTopic(childId,childName,topic,subject,grade){
   hideModal();
   await sbFetchSafe('topic_suggestions',{method:'POST',body:JSON.stringify({child_id:childId,topic,subject,grade,status:'approved',rationale:'Manually assigned by parent',created_at:new Date().toISOString()})});
   if(!childTopicAssignments[childId])childTopicAssignments[childId]=[];
   childTopicAssignments[childId].push({topic,subject,grade});
-  toast('📌 ' + topic + ' added to ' + childName + '!');
+  toast(`📌 ${topic} added to ${childName}!`);
 }
 async function approveSug(id){await sbFetchSafe('topic_suggestions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'approved'})});toast('✅ Approved!');showDashTab(currentDashTab);}
 async function rejectSug(id){await sbFetchSafe('topic_suggestions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'rejected'})});toast('❌ Rejected.');showDashTab(currentDashTab);}
 
 async function renderDashSprints(el){
-  const L=appSettings.dashLang==='fr';el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>';
+  const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
     const cards=await Promise.all(allChildren.map(async c=>{const sprints=await sbFetchSafe('flash_sprints?child_id=eq.'+c.id+'&order=created_at.desc&limit=10')||[];return{c,sprints};}));
     const ops={add:'Addition',sub:'Subtraction',mul:'Multiplication',div:'Division'};
-    let h='<div class="section-title">⚡ FlashSprint</div>';
-    h+=cards.map(({c,sprints})=>{
-      let ch='<div class="card" style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:26px">'+c.mascot+'</span><span style="font-family:\'Fredoka One\',cursive;font-size:17px;color:var(--p)">'+c.name+'</span></div>';
-      if(!sprints.length){ ch+='<div style="color:var(--mu);font-weight:700;font-size:13px">'+(L?'Aucun sprint.':'No sprints yet.')+'</div>'; }
-      else{ ch+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">'+(L?'Meilleur':'Best')+'</div><div style="font-weight:800;color:var(--p)">'+Math.min(...sprints.map(s=>s.total_time))+'s</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">'+(L?'Moy.':'Avg')+'</div><div style="font-weight:800;color:var(--g)">'+Math.round(sprints.reduce((a,s)=>a+s.accuracy,0)/sprints.length)+'%</div></div></div><table style="width:100%;font-size:11px;border-collapse:collapse"><tr style="background:var(--pl)"><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Date</th><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Op</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">'+(L?'Temps':'Time')+'</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">%</th></tr>'+sprints.slice(0,6).map((s,i)=>'<tr style="background:'+(i%2?'#fff':'#F9F7FF')+'"><td style="padding:5px 8px">'+s.date+'</td><td style="padding:5px 8px;font-weight:700">'+(ops[s.operation]||s.operation)+'</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:var(--p)">'+s.total_time+'s</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:'+(s.accuracy>=90?'var(--g)':s.accuracy>=70?'#D97706':'var(--r)')+'">'+s.accuracy+'%</td></tr>').join('')+'</table>'; }
-      ch+='</div>';return ch;
-    }).join('');el.innerHTML=h;
+    el.innerHTML=`<div class="section-title">⚡ FlashSprint</div>`+cards.map(({c,sprints})=>`<div class="card" style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:26px">${c.mascot}</span><span style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</span></div>${!sprints.length?`<div style="color:var(--mu);font-weight:700;font-size:13px">${L?'Aucun sprint.':'No sprints yet.'}</div>`:`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Meilleur':'Best'}</div><div style="font-weight:800;color:var(--p)">${Math.min(...sprints.map(s=>s.total_time))}s</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:8px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Moy.':'Avg'}</div><div style="font-weight:800;color:var(--g)">${Math.round(sprints.reduce((a,s)=>a+s.accuracy,0)/sprints.length)}%</div></div></div><table style="width:100%;font-size:11px;border-collapse:collapse"><tr style="background:var(--pl)"><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Date</th><th style="padding:5px 8px;text-align:left;color:var(--p);font-weight:700">Op</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">${L?'Temps':'Time'}</th><th style="padding:5px 8px;text-align:center;color:var(--p);font-weight:700">%</th></tr>${sprints.slice(0,6).map((s,i)=>`<tr style="background:${i%2?'#fff':'#F9F7FF'}"><td style="padding:5px 8px">${s.date}</td><td style="padding:5px 8px;font-weight:700">${ops[s.operation]||s.operation}</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:var(--p)">${s.total_time}s</td><td style="padding:5px 8px;text-align:center;font-weight:800;color:${s.accuracy>=90?'var(--g)':s.accuracy>=70?'#D97706':'var(--r)'}">${s.accuracy}%</td></tr>`).join('')}</table>`}</div>`).join('');
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load sprint data.</div>';}
 }
 
 async function renderDashProfiles(el){
   const L=appSettings.dashLang==='fr';
-  el.innerHTML='<div class="section-title">'+(L?'Gestion des profils':'Profiles')+'</div>'+allChildren.map(c=>'<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:14px 16px"><span style="font-size:32px">'+c.mascot+'</span><div style="flex:1"><div style="font-family:\'Fredoka One\',cursive;font-size:15px;color:var(--p)">'+c.name+'</div><div style="font-size:11px;font-weight:700;color:var(--mu)">'+c.grade+' • '+c.curriculum+'</div></div><button class="btn btn-danger btn-sm" onclick="confirmDelete(\''+c.id+'\',\''+c.name+'\')">🗑</button></div>').join('')+'<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="showAddChild()">+ '+(L?'Ajouter un enfant':'Add Child')+'</button>';
+  el.innerHTML=`<div class="section-title">${L?'Gestion des profils':'Profiles'}</div>${allChildren.map(c=>`<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:14px 16px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><button class="btn btn-danger btn-sm" onclick="confirmDelete('${c.id}','${c.name}')">🗑</button></div>`).join('')}<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="showAddChild()">+ ${L?'Ajouter un enfant':'Add Child'}</button>`;
 }
 function showAddChild(){
   const L=appSettings.dashLang==='fr';
-  let html='<h3 style="font-family:\'Fredoka One\',cursive;font-size:19px;color:var(--p);margin-bottom:14px">'+(L?'Ajouter un enfant':'Add Child')+'</h3>';
-  html+='<input type="text" id="nc-name" placeholder="Name" class="card" style="padding:12px;border:2px solid var(--br);margin-bottom:10px;outline:none;font-family:inherit;font-weight:700">';
-  html+='<div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Grade</label><select id="nc-grade">'+['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6'].map(g=>'<option>'+g+'</option>').join('')+'</select></div>';
-  html+='<div style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">PIN (4 digits)</label><input type="password" id="nc-pin" value="0000" class="card" style="padding:12px;border:2px solid var(--br);outline:none;font-family:inherit;font-weight:700;letter-spacing:4px"></div>';
-  html+='<div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px">Pick a Mascot</div>';
-  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px" id="nc-mascots">'+MASCOTS.map((m,i)=>'<div onclick="pickNCMascot(\''+m.e+'\',this)" style="text-align:center;padding:8px;border-radius:10px;cursor:pointer;border:2px solid '+(i===0?'var(--p)':'var(--br)')+';background:'+(i===0?'var(--pl)':'#fff')+'"><div style="font-size:28px">'+m.e+'</div></div>').join('')+'</div>';
-  html+='<div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button><button class="btn btn-success" style="flex:1" onclick="createChild()">+ Create</button></div>';
-  showModal(html);
+  showModal(`<h3 style="font-family:'Fredoka One',cursive;font-size:19px;color:var(--p);margin-bottom:14px">${L?'Ajouter un enfant':'Add Child'}</h3>
+  <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">${L?'Prénom':'Name'}</label><input type="text" id="nc-name"></div>
+  <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Grade</label><select id="nc-grade">${['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6'].map(g=>`<option>${g}</option>`).join('')}</select></div>
+  <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Curriculum</label><select id="nc-curr"><option>Canadian</option><option>Lebanese</option></select></div>
+  <div style="margin-bottom:12px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">PIN (4 digits)</label><input type="number" id="nc-pin" placeholder="e.g. 3456" min="1000" max="9999"></div>
+  <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:8px">Mascot</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px" id="nc-mascots">${MASCOTS.map((m,i)=>`<div onclick="pickNCMascot('${m.e}',this)" style="text-align:center;padding:8px;border-radius:10px;cursor:pointer;border:2px solid ${i===0?'var(--p)':'var(--br)'};background:${i===0?'var(--pl)':'#fff'}"><div style="font-size:28px">${m.e}</div><div style="font-size:9px;font-weight:700;color:var(--mu)">${m.n}</div></div>`).join('')}</div>
+  <div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button><button class="btn btn-success" style="flex:1" onclick="createChild()">+ Create</button></div>`);
+  window._ncMascot=MASCOTS[0].e;
 }
 function pickNCMascot(emoji,el){window._ncMascot=emoji;document.querySelectorAll('#nc-mascots>div').forEach(d=>{d.style.borderColor='var(--br)';d.style.background='#fff';});el.style.borderColor='var(--p)';el.style.background='var(--pl)';}
 async function createChild(){
@@ -1508,12 +1505,7 @@ async function createChild(){
   }catch(e){toast('Error creating profile.');}
 }
 function confirmDelete(id,name){
-  let html='<h3 style="font-family:\'Fredoka One\',cursive;font-size:18px;color:var(--r);margin-bottom:8px">⚠️ Delete Profile</h3>';
-  html+='<p style="font-weight:700;font-size:13px;margin-bottom:4px">Permanently delete <strong>'+name+'\'s</strong> profile?</p>';
-  html+='<p style="font-weight:600;font-size:12px;color:var(--mu);margin-bottom:16px">All data — progress, badges, stars, sessions — will be lost forever.</p>';
-  html+='<div style="background:var(--rl);border-radius:10px;padding:10px;margin-bottom:14px"><div style="font-weight:800;font-size:12px;color:#991B1B">Type "'+name+'" to confirm:</div><input type="text" id="del-confirm" placeholder="Type name here…" style="margin-top:6px;border-color:#FCA5A5"></div>';
-  html+='<div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button><button class="btn btn-danger" style="flex:1" onclick="deleteChild(\''+id+'\',\''+name+'\')">🗑 Delete</button></div>';
-  showModal(html);
+  showModal(`<h3 style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--r);margin-bottom:8px">⚠️ Delete Profile</h3><p style="font-weight:700;font-size:13px;margin-bottom:4px">Permanently delete <strong>${name}'s</strong> profile?</p><p style="font-weight:600;font-size:12px;color:var(--mu);margin-bottom:16px">All data — progress, badges, stars, sessions — will be lost forever.</p><div style="background:var(--rl);border-radius:10px;padding:10px;margin-bottom:14px"><div style="font-weight:800;font-size:12px;color:#991B1B">Type "${name}" to confirm:</div><input type="text" id="del-confirm" placeholder="Type name here…" style="margin-top:6px;border-color:#FCA5A5"></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button><button class="btn btn-danger" style="flex:1" onclick="deleteChild('${id}','${name}')">🗑 Delete</button></div>`);
 }
 async function deleteChild(id,name){
   const val=document.getElementById('del-confirm')?.value.trim();
@@ -1524,17 +1516,14 @@ async function deleteChild(id,name){
 
 async function renderDashSettings(el){
   const L=appSettings.dashLang==='fr';
-  let html='<div class="section-title">'+(L?'Paramètres':'Settings')+'</div>';
-  html+='<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:12px">🔒 '+(L?'Changer le PIN':'Change Parent PIN')+'</div>';
-  html+='<div style="margin-bottom:8px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">'+(L?'PIN actuel':'Current PIN')+'</label><input type="password" id="s-cur" placeholder="••••" maxlength="4"></div>';
-  html+='<div style="margin-bottom:8px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">'+(L?'Nouveau PIN':'New PIN')+'</label><input type="password" id="s-new" placeholder="••••" maxlength="4"></div>';
-  html+='<div style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">'+(L?'Confirmer':'Confirm')+'</label><input type="password" id="s-conf" placeholder="••••" maxlength="4"></div>';
-  html+='<button class="btn btn-primary btn-sm" onclick="changePin()">Change PIN</button></div>';
-  html+='<div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🌍 '+(L?'Langue':'Dashboard Language')+'</div><div style="display:flex;gap:8px"><button class="btn btn-sm '+(appSettings.dashLang==='en'?'btn-primary':'btn-secondary')+'" onclick="setDL(\'en\')">English</button><button class="btn btn-sm '+(appSettings.dashLang==='fr'?'btn-primary':'btn-secondary')+'" onclick="setDL(\'fr\')">Français</button></div></div>';
-  html+='<div class="card"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🎚️ '+(L?'Langue par enfant':'Language per Child')+'</div>';
-  html+=allChildren.map(c=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--br)"><div style="display:flex;align-items:center;gap:6px"><span>'+c.mascot+'</span><span style="font-weight:700;font-size:13px">'+c.name+'</span></div><select onchange="setChildLang(\''+c.id+'\',this.value)" style="width:auto;padding:5px 8px;font-size:11px"><option value="mixed" '+(c.lang_pref==='mixed'?'selected':'')+'>EN+FR</option><option value="en" '+(c.lang_pref==='en'?'selected':'')+'>English</option><option value="fr" '+(c.lang_pref==='fr'?'selected':'')+'>Français</option></select></div>').join('');
-  html+='</div>';
-  el.innerHTML=html;
+  el.innerHTML=`<div class="section-title">${L?'Paramètres':'Settings'}</div>
+  <div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:12px">🔒 ${L?'Changer le PIN':'Change Parent PIN'}</div>
+  <div style="margin-bottom:8px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">${L?'PIN actuel':'Current PIN'}</label><input type="password" id="s-cur" placeholder="••••" maxlength="4"></div>
+  <div style="margin-bottom:8px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">${L?'Nouveau PIN':'New PIN'}</label><input type="password" id="s-new" placeholder="••••" maxlength="4"></div>
+  <div style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">${L?'Confirmer':'Confirm'}</label><input type="password" id="s-conf" placeholder="••••" maxlength="4"></div>
+  <button class="btn btn-primary btn-sm" onclick="changePin()">Change PIN</button></div>
+  <div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🌍 ${L?'Langue':'Dashboard Language'}</div><div style="display:flex;gap:8px"><button class="btn btn-sm ${appSettings.dashLang==='en'?'btn-primary':'btn-secondary'}" onclick="setDL('en')">English</button><button class="btn btn-sm ${appSettings.dashLang==='fr'?'btn-primary':'btn-secondary'}" onclick="setDL('fr')">Français</button></div></div>
+  <div class="card"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🎚️ ${L?'Langue par enfant':'Language per Child'}</div>${allChildren.map(c=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--br)"><div style="display:flex;align-items:center;gap:6px"><span>${c.mascot}</span><span style="font-weight:700;font-size:13px">${c.name}</span></div><select onchange="setChildLang('${c.id}',this.value)" style="width:auto;padding:5px 8px;font-size:11px"><option value="mixed" ${c.lang_pref==='mixed'?'selected':''}>EN+FR</option><option value="en" ${c.lang_pref==='en'?'selected':''}>English</option><option value="fr" ${c.lang_pref==='fr'?'selected':''}>Français</option></select></div>`).join('')}</div>`;
 }
 async function changePin(){
   const cur=document.getElementById('s-cur')?.value;const nw=document.getElementById('s-new')?.value;const cf=document.getElementById('s-conf')?.value;
