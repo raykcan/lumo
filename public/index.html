@@ -1234,10 +1234,10 @@ function genSprintQs(op,from,to){
   const qs=[];
   for(let a=from;a<=to;a++){for(let b2=from;b2<=to;b2++){
     let q,ans;
-    if(op==='add'){q=`${a} + ${b2} = ?`;ans=a+b2;}
-    else if(op==='sub'&&a>=b2){q=`${a} − ${b2} = ?`;ans=a-b2;}
-    else if(op==='mul'){q=`${a} × ${b2} = ?`;ans=a*b2;}
-    else if(op==='div'&&b2!==0&&(a*b2)<=200){q=`${a*b2} ÷ ${b2} = ?`;ans=a;}
+    if(op==='add'){q=a+' + '+b2+' = ?';ans=a+b2;}
+    else if(op==='sub'&&a>=b2){q=a+' − '+b2+' = ?';ans=a-b2;}
+    else if(op==='mul'){q=a+' × '+b2+' = ?';ans=a*b2;}
+    else if(op==='div'&&b2!==0&&(a*b2)<=200){q=(a*b2)+' ÷ '+b2+' = ?';ans=a;}
     if(q!==undefined)qs.push({q,ans});
   }}
   return qs.sort(()=>Math.random()-.5);
