@@ -1,4 +1,3 @@
-<!-- UPDATED FOR LOADING FIX + VERCEL DEPLOYMENT -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -395,12 +394,12 @@ input:focus,select:focus{border-color:var(--p)}
 <div id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#1E1B4B;color:#fff;padding:10px 22px;border-radius:100px;font-weight:700;font-size:13px;transition:transform .3s;z-index:2000;pointer-events:none;white-space:nowrap"></div>
 
 <script>
-const SB_URL='https://jwyapunaktwmyxwvfpeb.supabase.co';
-const SB_KEY='sb_publishable_jknkJ-FqbDUdKjU3UfECnQ_-kxIGhoU';
+const SB_URL='sb_publishable_jknkJ-FqbDUdKjU3UfECnQ_-kxIGhoU';
+const SB_KEY='https://jwyapunaktwmyxwvfpeb.supabase.co';
 const CLAUDE_MODEL='claude-sonnet-4-20250514';
 
 async function sbFetch(path,opts={}){
-  const r=await fetch(SB_URL+'/rest/v1/'+path,{
+  console.log('SB fetch', path); const r=await fetch(SB_URL+'/rest/v1/'+path,{
     headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
     ...opts
   });
@@ -485,6 +484,7 @@ async function init(){
   }catch(e){
     document.getElementById('land-loading').innerHTML='';
     const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
+    window.__startupOk=true; window.__startupErr='';
   }
 }
 init();
@@ -1353,45 +1353,37 @@ function showSessionDetail(s){
   const totalQ=s.total||10;
   const wrongCount=Math.max(0,totalQ-goodCount);
   const hasDetailed=wrong.some(w=>w && (w.text||w.answer||w.userAnswer||w.explanation));
-  const html=`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <div style="flex:1">
-        <div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${s.subject||''} — ${s.topic||''}</div>
-        <div style="font-size:11px;color:var(--mu);font-weight:700">${s.date||''} • ${s.duration||''}min • ${s.mode||'practice'} mode</div>
-      </div>
-      <div style="font-family:'Fredoka One',cursive;font-size:26px;color:${goodCount>=8?'var(--g)':goodCount>=6?'#D97706':'var(--r)'}">${goodCount}/${totalQ}</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <div class="card card-sm" style="text-align:center;background:var(--gl)">
-        <div style="font-size:10px;font-weight:700;color:var(--mu)">✅ Correct</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g)">${goodCount}</div>
-      </div>
-      <div class="card card-sm" style="text-align:center;background:var(--rl)">
-        <div style="font-size:10px;font-weight:700;color:var(--mu)">❌ Mistakes</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--r)">${wrongCount}</div>
-      </div>
-    </div>
-    ${wrong.length && hasDetailed ? `
-      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">❌ Wrong Answers Review</div>
-      <div style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto">
-        ${wrong.map((w,i)=>`
-          <div style="background:var(--rl);border-radius:11px;padding:11px 13px">
-            <div style="font-size:12px;font-weight:800;margin-bottom:5px;color:var(--tx)">Q${i+1}: ${w.text||'Question not saved'}</div>
-            <div style="font-size:11px;color:#991B1B;font-weight:700;margin-bottom:2px">Your answer: ${String(w.userAnswer ?? '—') || '—'}</div>
-            <div style="font-size:11px;color:var(--g);font-weight:800;margin-bottom:2px">✓ Correct: ${String(w.answer ?? '—') || '—'}</div>
-            ${w.explanation?`<div style="font-size:11px;color:var(--mu);margin-top:4px;line-height:1.45">${w.explanation}</div>`:''}
-          </div>`).join('')}
-      </div>
-    ` : wrong.length ? `
-      <div style="background:var(--yl);border-radius:12px;padding:12px 14px;font-size:12px;font-weight:700;color:#92400E;line-height:1.45">
-        Detailed wrong-answer content was not saved for this older session. New sessions will now store the question, the child's answer, and the correct answer.
-      </div>
-    ` : `
-      <div style="text-align:center;padding:16px;font-weight:700;color:var(--g);font-size:14px">🌟 Perfect session — no mistakes!</div>
-    `}
-    <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="hideModal()">Close</button>
-  `;
-  showModal(html);
+  let body='';
+  body += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
+  body += '<div style="flex:1">';
+  body += '<div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">'+(s.subject||'')+' — '+(s.topic||'')+'</div>';
+  body += '<div style="font-size:11px;color:var(--mu);font-weight:700">'+(s.date||'')+' • '+(s.duration||'')+'min • '+(s.mode||'practice')+' mode</div>';
+  body += '</div>';
+  body += '<div style="font-family:'Fredoka One',cursive;font-size:26px;color:'+(goodCount>=8?'var(--g)':goodCount>=6?'#D97706':'var(--r)')+'">'+goodCount+'/'+totalQ+'</div>';
+  body += '</div>';
+  body += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">';
+  body += '<div class="card card-sm" style="text-align:center;background:var(--gl)"><div style="font-size:10px;font-weight:700;color:var(--mu)">✅ Correct</div><div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g)">'+goodCount+'</div></div>';
+  body += '<div class="card card-sm" style="text-align:center;background:var(--rl)"><div style="font-size:10px;font-weight:700;color:var(--mu)">❌ Mistakes</div><div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--r)">'+wrongCount+'</div></div>';
+  body += '</div>';
+  if(wrong.length && hasDetailed){
+    body += '<div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">❌ Wrong Answers Review</div>';
+    body += '<div style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto">';
+    wrong.forEach((w,i)=>{
+      body += '<div style="background:var(--rl);border-radius:11px;padding:11px 13px">';
+      body += '<div style="font-size:12px;font-weight:800;margin-bottom:5px;color:var(--tx)">Q'+(i+1)+': '+(w.text||'Question not saved')+'</div>';
+      body += '<div style="font-size:11px;color:#991B1B;font-weight:700;margin-bottom:2px">Your answer: '+String(w.userAnswer ?? '—')+'</div>';
+      body += '<div style="font-size:11px;color:var(--g);font-weight:800;margin-bottom:2px">✓ Correct: '+String(w.answer ?? '—')+'</div>';
+      if(w.explanation) body += '<div style="font-size:11px;color:var(--mu);margin-top:4px;line-height:1.45">'+w.explanation+'</div>';
+      body += '</div>';
+    });
+    body += '</div>';
+  } else if(wrong.length){
+    body += '<div style="background:var(--yl);border-radius:12px;padding:12px 14px;font-size:12px;font-weight:700;color:#92400E;line-height:1.45">Detailed wrong-answer content was not saved for this older session. New sessions will now store the question, the child's answer, and the correct answer.</div>';
+  } else {
+    body += '<div style="text-align:center;padding:16px;font-weight:700;color:var(--g);font-size:14px">🌟 Perfect session — no mistakes!</div>';
+  }
+  body += '<button class="btn btn-primary btn-full" style="margin-top:14px" onclick="hideModal()">Close</button>';
+  showModal(body);
 }
 
 
