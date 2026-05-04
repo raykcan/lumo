@@ -1193,12 +1193,12 @@ function showFeedback(correct,q){
     const pts=Math.floor(Math.random()*2)+2;sessStars+=pts;document.getElementById('sess-stars').textContent=sessStars;q.starsEarned=pts;
     fc.style.cssText='margin-bottom:10px;border:2px solid var(--g);background:var(--gl)';
     const msgs=q.lang==='fr'?['Excellent travail ! 🌟','Super, c\'est parfait ! ✅','Bravo ! 🎉']:q.lang==='ar'?['ممتاز! 🌟','أحسنت! ✅','رائع! 🎉']:['Great job! 🌟','Excellent! ✅','Brilliant! 🎉'];
-    ft.innerHTML=`<span style="color:#065F46;font-weight:800">${msgs[Math.floor(Math.random()*msgs.length)]} (+${pts} ⭐)</span>${q.explanation?`<div style="margin-top:6px;font-size:13px;color:#065F46">${q.explanation}</div>`:''}`;
+    ft.innerHTML='<span style="color:#065F46;font-weight:800">'+msgs[Math.floor(Math.random()*msgs.length)]+' (+'+pts+' ⭐)</span>'+(q.explanation?'<div style="margin-top:6px;font-size:13px;color:#065F46">'+q.explanation+'</div>':'');
     mascot.style.transform='scale(1.15) rotate(4deg)';setTimeout(()=>mascot.style.transform='',400);
   }else{
     fc.style.cssText='margin-bottom:10px;border:2px solid #FCA5A5;background:#FEF2F2';
     const near=q.lang==='fr'?'Presque ! 💪':q.lang==='ar'?'تقريباً! 💪':'Almost! 💪';
-    ft.innerHTML=`<div style="color:#991B1B;font-weight:800;margin-bottom:5px">${near}</div><div style="color:#991B1B;margin-bottom:4px">✏️ Correct answer: <strong>${q.answer}</strong></div><div style="color:var(--p);font-size:13px">💡 ${q.explanation||q.hint||''}</div>`;
+    ft.innerHTML='<div style="color:#991B1B;font-weight:800;margin-bottom:5px">'+near+'</div><div style="color:#991B1B;margin-bottom:4px">✏️ Correct answer: <strong>'+q.answer+'</strong></div><div style="color:var(--p);font-size:13px">💡 '+(q.explanation||q.hint||'')+'</div>';
   }
   fc.classList.remove('hidden');
 }
