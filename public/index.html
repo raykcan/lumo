@@ -596,7 +596,7 @@ async function renderHomeTab(el){
   const pct=((currentChild.stars%50)/50*100).toFixed(0);
   const stn=50-(currentChild.stars%50);
   let lastHTML='';
-  const sessions=await sbFetchSafe('sessions?child_id=eq.'+currentChild.id+'&order=created_at.desc&limit=1');
+  const sessions=await sbFetchSafe('learning_sessions?child_id=eq.'+currentChild.id+'&order=created_at.desc&limit=1');
   if(sessions&&sessions[0]){const s=sessions[0];lastHTML=`<div class="card card-sm" style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:6px">📖 Last Session</div><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:14px">${s.subject}</div><div style="font-size:12px;color:var(--mu);font-weight:600">${s.topic}</div></div><div style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--p)">${s.score}/10</div></div></div>`;}
   el.innerHTML=`
     <div style="text-align:center;margin-bottom:20px">
@@ -1442,7 +1442,7 @@ async function endSession(){
     const topicSummary=(cfg.topics&&cfg.topics.length)?cfg.topics.join(' • '):(cfg.topic||'');
     const allQsForDB=sessionQs.map(q=>({text:q.text||'',type:q.type||'mc',qformat:q.qformat||'text',topic:q.topic||'',correct:!!q.userCorrect}));
     const sessId='sess_'+Date.now()+'_'+Math.floor(Math.random()*9999);
-    await sbFetchSafe('sessions',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:sessId,child_id:currentChild.id,date:new Date().toISOString().split('T')[0],subject:subj?.label||cfg.subject,topic:topicSummary,score:correct,total:total,duration:Math.floor(12+Math.random()*8),wrong_questions:JSON.stringify(wrongForDB),all_questions:JSON.stringify(allQsForDB),mode:cfg.mode,lang:cfg.lang==='fr'?'Français':cfg.lang==='ar'?'عربي':'English'})});
+    await sbFetchSafe('learning_sessions',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:sessId,child_id:currentChild.id,date:new Date().toISOString().split('T')[0],subject:subj?.label||cfg.subject,topic:topicSummary,score:correct,total:total,duration:Math.floor(12+Math.random()*8),wrong_questions:JSON.stringify(wrongForDB),all_questions:JSON.stringify(allQsForDB),mode:cfg.mode,lang:cfg.lang==='fr'?'Français':cfg.lang==='ar'?'عربي':'English'})});
   }
   document.getElementById('res-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('res-score').textContent=score+'/10';
@@ -1549,7 +1549,7 @@ async function renderDashOverview(el){
     // Always refresh children list so star/session counts are current
     const freshKids=await sbFetchSafe('children?select=*&order=created_at.asc');
     if(freshKids&&freshKids.length)allChildren=freshKids;
-    const [sugs,childData]=await Promise.all([sbFetchSafe('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc'),Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}))]);
+    const [sugs,childData]=await Promise.all([sbFetchSafe('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc'),Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('learning_sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}))]);
     const pending=(sugs||[]).filter(s=>s.status==='pending');
     el.innerHTML=`
       ${pending.length?`<div style="background:var(--yl);border:1px solid #FCD34D;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:800;font-size:13px;color:#92400E;margin-bottom:8px">🔔 ${pending.length} ${L?'suggestion(s)':'pending suggestion(s)'}</div>${pending.map(s=>`<div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:7px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">${s.children?.name||''}: ${s.text}</div><div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" onclick="approveS('${s.id}')">✓ ${L?'Approuver':'Approve'}</button><button class="btn btn-sm btn-danger" onclick="rejectS('${s.id}')">✗ ${L?'Rejeter':'Reject'}</button></div></div>`).join('')}</div>`:''}
@@ -1563,7 +1563,7 @@ async function renderDashAnalytics(el){
   try{
     const freshKids=await sbFetchSafe('children?select=*&order=created_at.asc');
     if(freshKids&&freshKids.length)allChildren=freshKids;
-    const cards=await Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}));
+    const cards=await Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('learning_sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}));
     el.innerHTML=cards.map(({c,sessions})=>{
       const bySubj={};sessions.forEach(s=>{if(!bySubj[s.subject])bySubj[s.subject]=[];bySubj[s.subject].push(s.score);});
       return`<div class="card" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:26px">${c.mascot}</span><span style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</span></div>
