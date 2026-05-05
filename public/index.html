@@ -418,10 +418,37 @@ async function claudeAsk(prompt,sys){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:1000,system:sys||'You are Lumo, a helpful educational AI.',messages:[{role:'user',content:prompt}]})
   });
+  if(!r.ok){const e=await r.text();throw new Error('Claude API '+r.status+': '+e);}
   const d=await r.json();
+  if(d.error)throw new Error('Claude error: '+JSON.stringify(d.error));
   return d.content?.[0]?.text||'';
 }
 
+
+// ── Badge helpers ──
+// All default badges a child can earn (shown greyed-out until earned)
+const ALL_BADGES = [
+  {label:'Math Star L1',subj:'math',level:1},{label:'Math Star L2',subj:'math',level:2},{label:'Math Star L3',subj:'math',level:3},
+  {label:'Science Star L1',subj:'science',level:1},{label:'Science Star L2',subj:'science',level:2},
+  {label:'History Star L1',subj:'history',level:1},{label:'History Star L2',subj:'history',level:2},
+  {label:'Geo Star L1',subj:'geography',level:1},{label:'Geo Star L2',subj:'geography',level:2},
+  {label:'French Star L1',subj:'french',level:1},{label:'French Star L2',subj:'french',level:2},
+  {label:'English Star L1',subj:'english',level:1},{label:'English Star L2',subj:'english',level:2},
+  {label:'Arabic Star L1',subj:'arabic',level:1},
+  {label:'FlashSprint Ace',subj:'sprint',level:1},{label:'Speed Demon',subj:'sprint',level:2},
+  {label:'Perfect Score',subj:'any',level:1},{label:'5-Session Streak',subj:'any',level:2},
+];
+function parseBadges(raw){
+  try{
+    const arr=typeof raw==='string'?JSON.parse(raw||'[]'):Array.isArray(raw)?raw:[];
+    return Array.isArray(arr)?arr:[];
+  }catch(e){return[];}
+}
+function getBadgeDisplay(child){
+  const earned=parseBadges(child.badges);
+  const earnedLabels=new Set(earned.map(b=>b.label||b));
+  return ALL_BADGES.map(b=>({...b,earned:earnedLabels.has(b.label)}));
+}
 const SUBJECTS=[
   {id:'math',label:'Mathematics',emoji:'🔢'},
   {id:'science',label:'Sciences',emoji:'🔬'},
@@ -436,7 +463,7 @@ const TOPICS={
   math:{'Grade 1':['Addition (0–20)','Subtraction (0–20)','Counting & Number Sense','Patterns','2D Shapes','Measurement & Comparing','Time Basics'],'Grade 2':['Addition & Subtraction to 100','Skip Counting','Place Value','Intro to Multiplication','Fractions (½ ¼ ⅓)','Shapes & Geometry','Measurement','Money & Coins'],'Grade 3':['Multiplication Facts (0–10)','Division Basics','Multi-digit Addition & Subtraction','Fractions & Equivalence','Decimals Intro','Area & Perimeter','3D Figures','Data & Graphs'],'Grade 4':['Multi-digit Multiplication','Long Division','Adding & Subtracting Fractions','Decimals','Angles & Lines','Geometric Properties','Data Management','Intro to Algebra'],'Grade 5':['Whole Number Operations','Fraction Operations','Decimals & Percentages','Ratios & Rates','Geometry Transformations','Volume & Capacity','Patterning & Algebra','Statistics & Probability'],'Grade 6':['Integers','Ratio & Proportion','Percent','Algebraic Expressions','Equations','Geometry — Circles & Triangles','Surface Area & Volume','Data Analysis']},
   science:{'Grade 1':['Living & Non-Living Things','Plants & Animals','Seasonal Changes','Properties of Materials','Our Senses'],'Grade 2':['Animal Life Cycles','Habitats & Ecosystems','Air Water & Soil','Forces & Movement','Light & Sound'],'Grade 3':['Ecosystems & Food Chains','Simple Machines','Rocks Minerals & Soil','Plant Reproduction','Heat & Temperature'],'Grade 4':['Habitats & Communities','Pulleys & Gears','Rock Cycle','Light & Sound Waves','Electricity Basics'],'Grade 5':['Human Body Systems','Forces on Structures','Properties of Matter','Conservation of Energy','Earth & Space'],'Grade 6':['Biodiversity','Flight & Aerodynamics','Electricity & Safety','Space Systems',"Newton's Laws"]},
   history:{'Grade 1':['My Family & Community','Canadian Symbols','Community Helpers'],'Grade 2':['Early Canadian Communities','Indigenous Peoples','Canadian Traditions'],'Grade 3':['Indigenous Communities','Early Settlers','Communities Around the World'],'Grade 4':['Early Civilizations','Medieval Times','First Peoples of Canada'],'Grade 5':['Fur Trade & New France','British North America','Confederation 1867','Lebanon: Early Civilizations'],'Grade 6':['Ancient Civilizations','Colonialism','World Wars Overview','Modern Canada & Lebanon']},
-  geography:{'Grade 1':['My Neighbourhood & Maps','Continents & Oceans','Land & Water Forms'],'Grade 2':['Maps & Compass Directions','Canadian Provinces','Climate & Seasons'],'Grade 3':['Physical Features of Canada','World Regions','Natural Resources'],'Grade 4':['Canadian Landforms','Population & Settlement','Geography of Lebanon'],'Grade 5':['Ecosystems of Canada','Trading Partners','Migration & Immigration','Lebanon: Geography & Regions'],'Grade 6':['Global Environmental Issues','Sustainable Development','Political Maps','Economic Geography']},
+  geography:{'Grade 1':['My Neighbourhood & Maps','Continents & Oceans','Land & Water Forms','Country Flags','World Capitals','Countries & Locations','General Geography Knowledge'],'Grade 2':['Maps & Compass Directions','Canadian Provinces','Climate & Seasons','Country Flags','World Capitals','Countries & Locations'],'Grade 3':['Physical Features of Canada','World Regions','Natural Resources','Country Flags','World Capitals','Countries & Locations','General Geography Knowledge'],'Grade 4':['Canadian Landforms','Population & Settlement','Geography of Lebanon','Country Flags','World Capitals','Countries & Locations'],'Grade 5':['Ecosystems of Canada','Trading Partners','Migration & Immigration','Lebanon: Geography & Regions','Country Flags','World Capitals','Countries & Locations','General Geography Knowledge'],'Grade 6':['Global Environmental Issues','Sustainable Development','Political Maps','Economic Geography','Country Flags','World Capitals','Countries & Locations','General Geography Knowledge']},
   french:{'Grade 1':['Alphabet & Phonics','Numbers 1–20','Colours Shapes Body Parts','Greetings & Classroom Language'],'Grade 2':['Family & Friends','School & Objects','Simple Sentences & Articles','Telling Time'],'Grade 3':['Verbs Être & Avoir','Present Tense Verbs','Adjective Agreement','Reading Short Texts'],'Grade 4':['Passé Composé','Irregular Verbs','Writing Paragraphs','French Canadian Culture'],'Grade 5':['Imparfait vs Passé Composé','Pronouns','Reading & Comprehension','Oral Expression'],'Grade 6':['Advanced Grammar','Essay Writing','Literary Texts','French-Speaking World']},
   english:{'Grade 1':['Phonics & Sight Words','Sentence Building','Reading Comprehension','Nouns & Verbs'],'Grade 2':['Reading Comprehension','Adjectives & Adverbs','Story Writing','Punctuation'],'Grade 3':['Paragraph Writing','Parts of Speech','Reading Strategies','Spelling Patterns'],'Grade 4':['Essay Structure','Figurative Language','Literary Elements','Research Skills'],'Grade 5':['Persuasive Writing','Advanced Grammar','Poetry Analysis','Vocabulary'],'Grade 6':['Argumentative Essays','Grammar Mastery','Novel Study','Critical Reading']},
   arabic:{'Grade 1':['Arabic Alphabet (1–14)','Arabic Alphabet (15–28)','Basic Vocabulary','Reading Simple Words'],'Grade 2':['Reading Sentences','Numbers in Arabic','Writing Practice','Basic Grammar'],'Grade 3':['Reading Comprehension','Verb Conjugation','Writing Paragraphs','Arabic Diacritics'],'Grade 4':['Noun Types','Past & Present Tense','Reading Passages','Poetry & Prose'],'Grade 5':['Advanced Grammar','Essay Writing','Classical Arabic Intro','Comprehension'],'Grade 6':['Arabic Rhetoric','Literary Texts','Composition','Arabic Media']}
@@ -532,6 +559,12 @@ async function loadApprovedTopics(){
   const rows=await sbFetchSafe('topic_suggestions?child_id=eq.'+currentChild.id+'&status=eq.approved&select=topic,subject,grade');
   currentChild._approvedTopics=rows||[];
 }
+// Convert subject label→id for matching (handles both stored formats)
+function subjectLabelToId(val){
+  if(!val)return val;
+  const found=SUBJECTS.find(s=>s.id===val||s.label===val||s.label.toLowerCase()===val.toLowerCase());
+  return found?found.id:val;
+}
 function enterHome(){
   document.getElementById('h-mascot').textContent=currentChild.mascot;
   document.getElementById('h-name').textContent=currentChild.name;
@@ -585,7 +618,7 @@ async function renderHomeTab(el){
     <div class="card card-sm">
       <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:8px">🏅 Earned Badges</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        ${(currentChild.badges||[]).filter(b=>b.earned).slice(0,4).map(b=>`<div style="text-align:center"><div style="font-size:24px">🏅</div><div style="font-size:9px;font-weight:700;color:var(--p)">${b.label}</div></div>`).join('')||'<div style="color:var(--mu);font-weight:700;font-size:13px">Complete sessions to earn badges!</div>'}
+        ${(()=>{const eb=getBadgeDisplay(currentChild).filter(b=>b.earned).slice(0,4);return eb.length?eb.map(b=>`<div style="text-align:center"><div style="font-size:24px">🏅</div><div style="font-size:9px;font-weight:700;color:var(--p)">${b.label}</div></div>`).join(''):'<div style="color:var(--mu);font-weight:700;font-size:13px">Complete sessions to earn badges!</div>'})()}
       </div>
     </div>`;
 }
@@ -596,9 +629,17 @@ function renderLearnTab(el){
   </div>`;
 }
 function renderBadgesTab(el){
+  const all=getBadgeDisplay(currentChild);
+  const earned=all.filter(b=>b.earned);
+  const locked=all.filter(b=>!b.earned);
   el.innerHTML=`<div class="section-title">Your Badges 🏅</div>
+  ${earned.length?`<div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:8px;margin-top:-4px">✅ Earned (${earned.length})</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
+    ${earned.map(b=>`<div class="card" style="text-align:center;padding:14px 6px;border:2px solid var(--y);background:var(--yl)"><div style="font-size:28px">🏅</div><div style="font-size:10px;font-weight:800;margin-top:3px;color:var(--p)">${b.label}</div><div style="font-size:9px;color:var(--g);font-weight:700;margin-top:2px">✓ Earned!</div></div>`).join('')}
+  </div>`:'<div class="card card-sm" style="margin-bottom:16px;text-align:center;color:var(--mu);font-weight:700">No badges earned yet — complete sessions to earn your first! 🌟</div>'}
+  <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:8px">🔒 To Unlock (${locked.length})</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-    ${(typeof currentChild.badges==='string'?JSON.parse(currentChild.badges||'[]'):(currentChild.badges||[])).map(b=>`<div class="card" style="text-align:center;padding:14px 6px;${b.earned?'border:2px solid var(--y)':'opacity:.45'}"><div style="font-size:28px">${b.earned?'🏅':'🔒'}</div><div style="font-size:10px;font-weight:700;margin-top:3px;color:${b.earned?'var(--p)':'var(--mu)'}">${b.label}</div>${b.earned?'<div style="font-size:9px;color:var(--g);font-weight:700;margin-top:2px">✓ Earned!</div>':''}</div>`).join('')}
+    ${locked.map(b=>`<div class="card" style="text-align:center;padding:14px 6px;opacity:.45"><div style="font-size:28px">🔒</div><div style="font-size:10px;font-weight:700;margin-top:3px;color:var(--mu)">${b.label}</div></div>`).join('')}
   </div>`;
 }
 function renderProfileTab(el){
@@ -658,8 +699,9 @@ function selectSubject(id){
   SUBJECTS.forEach(s=>{const b=document.getElementById('sb-'+s.id);if(b){b.style.borderColor=s.id===id?'var(--p)':'var(--br)';b.style.background=s.id===id?'var(--pl)':'#fff';}});
   const grade=currentChild?.grade||'Grade 1';
   const basTopics=(TOPICS[id]||{})[grade]||['General'];
+  // Match assigned topics: normalise stored subject (may be label or id), ignore grade restriction
   const assignedTopics=(currentChild._approvedTopics||[])
-    .filter(t=>t.subject===id&&t.grade===grade).map(t=>t.topic);
+    .filter(t=>subjectLabelToId(t.subject)===id).map(t=>t.topic);
   const gradeTopics=[...new Set([...basTopics,...assignedTopics])];
   const box=document.getElementById('topic-checkboxes');
   box.innerHTML=gradeTopics.map(t=>`
@@ -706,6 +748,7 @@ async function startSession(){
   if(!cfg.topics||!cfg.topics.length){toast('Please choose at least one topic! 🎯');return;}
   sessionQs=[];sessIdx=0;sessAnswered=false;sessStars=0;
   Object.keys(_usedQIndices).forEach(k=>delete _usedQIndices[k]); // reset per-session
+  window._topicQueue=null; // reset topic queue
   document.getElementById('sess-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('q-tot').textContent=cfg.count;
   document.getElementById('sess-stars').textContent='0';
@@ -728,7 +771,7 @@ async function loadNextQ(){
   const msgs=['Generating your question…','Thinking of a great question…','Crafting something just for you…','Almost ready…'];
   document.getElementById('q-loading-text').textContent=msgs[sessIdx%msgs.length];
   try{
-    const q=await genQ(sessIdx);sessionQs.push(q);renderQ(q);
+    const q=await genQ(sessIdx);if(!q){document.getElementById('q-loading-text').innerHTML='⚠️ Could not load a question. <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="loadNextQ()">↺ Retry</button>';return;}sessionQs.push(q);renderQ(q);
   }catch(e){
     document.getElementById('q-loading-text').innerHTML='⚠️ Connection issue. <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="loadNextQ()">↺ Retry</button>';
   }
@@ -736,6 +779,63 @@ async function loadNextQ(){
 
 
 const _usedQIndices = {}; // keyed by 'subject|topic|grade' for proper per-topic tracking
+const _topicMastery = {}; // keyed by 'subject|topic' → {correct:N, total:N, level:1-5}
+
+// ── AI Question Cache: grows the bank with AI-generated questions ──
+const _aiCache = {}; // runtime cache key: subject|topic|grade → [questions]
+function loadAICache(){
+  try{
+    const raw=localStorage.getItem('lumo_ai_bank');
+    if(raw){const d=JSON.parse(raw);Object.assign(_aiCache,d);}
+  }catch(e){}
+}
+function saveAICache(){
+  try{
+    // Only keep last 20 questions per key to avoid localStorage bloat
+    const trimmed={};
+    Object.keys(_aiCache).forEach(k=>{trimmed[k]=_aiCache[k].slice(-20);});
+    localStorage.setItem('lumo_ai_bank',JSON.stringify(trimmed));
+  }catch(e){}
+}
+function cacheAIQuestion(subject,topic,grade,q){
+  const k=subject+'|'+topic+'|'+grade;
+  if(!_aiCache[k])_aiCache[k]=[];
+  // Don't duplicate
+  if(!_aiCache[k].find(x=>x.text===q.text)){
+    _aiCache[k].push({text:q.text,type:q.type,opts:q.opts,answer:q.answer,hint:q.hint,explanation:q.explanation,qformat:q.qformat});
+    saveAICache();
+  }
+}
+function getAICachedQ(subject,topic,grade,usedIndices){
+  const k=subject+'|'+topic+'|'+grade;
+  const pool=_aiCache[k]||[];
+  if(!pool.length)return null;
+  const cacheKey='ai|'+k;
+  if(!usedIndices[cacheKey])usedIndices[cacheKey]=new Set();
+  const used=usedIndices[cacheKey];
+  const available=pool.map((_,i)=>i).filter(i=>!used.has(i));
+  if(!available.length){used.clear();return pool[Math.floor(Math.random()*pool.length)];}
+  const pick=available[Math.floor(Math.random()*available.length)];
+  used.add(pick);
+  return pool[pick];
+}
+loadAICache(); // load on startup
+function getMasteryLevel(subject, topic){
+  const k=subject+'|'+topic;
+  if(!_topicMastery[k])_topicMastery[k]={correct:0,total:0,level:1};
+  return _topicMastery[k];
+}
+function updateMastery(subject, topic, wasCorrect){
+  const m=getMasteryLevel(subject,topic);
+  m.total++;
+  if(wasCorrect)m.correct++;
+  // Adjust level: go up if >80% over last 5, down if <40%
+  if(m.total>=3){
+    const rate=m.correct/m.total;
+    if(rate>=0.85&&m.level<5)m.level++;
+    else if(rate<0.4&&m.level>1)m.level--;
+  }
+}
 
 
 const QB = {
@@ -767,10 +867,38 @@ const QB = {
         {type:"input",text:"What comes next? 10, 20, 30, 40, ___",answer:"50",hint:"Add 10 each time: 40 + 10 = ?",explanation:"Skip counting by 10s: 40 + 10 = 50."}
       ],
       "Counting & Number Sense": [
-        {type:"mc",text:"Which number is greater: 14 or 17?",opts:["14","17","They are equal","Cannot tell"],answer:"17",hint:"On a number line, 17 comes after 14.",explanation:"17 > 14. 17 is 3 more than 14, so it is the greater number."},
-        {type:"input",text:"What number comes just before 20?",answer:"19",hint:"Count: ...17, 18, 19, 20. What is right before 20?",explanation:"19 comes just before 20 on the number line."},
-        {type:"mc",text:"How many tens are in the number 16?",opts:["0","1","6","16"],answer:"1",hint:"16 = 1 ten + 6 ones. How many tens?",explanation:"16 has 1 ten (the digit in the tens place) and 6 ones."},
-        {type:"tf",text:"The number 15 has 5 in the ones place.",answer:"true",hint:"In 15: the 1 is in the tens place and the 5 is in the ones place.",explanation:"True! In 15, the 5 is in the ones place and 1 is in the tens place."}
+        {type:"mc",text:"Which number is greater: 14 or 17?",opts:["14","17","They are equal","Cannot tell"],answer:"17",hint:"On a number line, 17 comes after 14.",explanation:"17 > 14."},
+        {type:"input",text:"What number comes just before 20?",answer:"19",hint:"Count: ...17, 18, 19, 20.",explanation:"19 comes just before 20."},
+        {type:"mc",text:"How many tens are in the number 16?",opts:["0","1","6","16"],answer:"1",hint:"16 = 1 ten + 6 ones.",explanation:"16 has 1 ten."},
+        {type:"tf",text:"The number 15 has 5 in the ones place.",answer:"true",hint:"In 15: 1 is tens, 5 is ones.",explanation:"True!"},
+        {type:"mc",text:"A store has:
+🍎 Apples: 12
+🍊 Oranges: 8
+🍌 Bananas: 15
+🍇 Grapes: 6
+
+Which fruit has the most?",opts:["Apples","Oranges","Bananas","Grapes"],answer:"Bananas",hint:"Find the biggest number in the list.",explanation:"Bananas have 15 — the largest number in the table.",qformat:"table"},
+        {type:"mc",text:"A number line goes: 10 → 12 → 14 → ___ → 18. What is the missing number?",opts:["15","16","17","19"],answer:"16",hint:"Count up by 2s each time.",explanation:"10,12,14,16,18 — skip counting by 2s.",qformat:"chart"}
+      ],
+      "2D Shapes": [
+        {type:"mc",text:"How many sides does a triangle have?",opts:["2","3","4","5"],answer:"3",hint:"Tri means three!",explanation:"A triangle has 3 sides and 3 corners."},
+        {type:"mc",text:"How many corners does a square have?",opts:["3","4","5","6"],answer:"4",hint:"Count the corners of a square piece of paper.",explanation:"A square has 4 sides and 4 corners."},
+        {type:"tf",text:"A circle has corners.",answer:"false",hint:"A circle is perfectly round — no straight lines or corners.",explanation:"False! A circle has no corners or straight sides."},
+        {type:"mc",text:"Which shape has 6 sides?",opts:["Pentagon","Hexagon","Octagon","Square"],answer:"Hexagon",hint:"Hex means six in Greek.",explanation:"A hexagon has 6 sides. Think of a honeycomb!"},
+        {type:"input",text:"A rectangle has 4 sides. How many corners does it have?",answer:"4",hint:"Every corner is where two sides meet. Count them!",explanation:"A rectangle has 4 corners — one at each end."},
+        {type:"mc",text:"Look at these shapes:
+▲ Triangle — 3 sides
+■ Square — 4 sides
+⬠ Pentagon — 5 sides
+⬡ Hexagon — 6 sides
+
+What shape has more sides than a pentagon but fewer than a hexagon?",opts:["Triangle","Square","No such shape","Hexagon"],answer:"No such shape",hint:"Check the numbers: 5 sides is pentagon, 6 is hexagon.",explanation:"There is no whole shape with more than 5 and fewer than 6 sides.",qformat:"table"}
+      ],
+      "Measurement & Comparing": [
+        {type:"mc",text:"Which unit would you use to measure how tall you are?",opts:["Kilograms","Litres","Centimetres","Degrees"],answer:"Centimetres",hint:"We measure height in length units.",explanation:"Height is measured in centimetres (cm) or metres (m)."},
+        {type:"tf",text:"A book is heavier than a feather.",answer:"true",hint:"Feathers are extremely light.",explanation:"True! Books are much heavier than feathers."},
+        {type:"mc",text:"Sara is 120 cm tall. Ben is 115 cm tall. How much taller is Sara?",opts:["3 cm","5 cm","7 cm","10 cm"],answer:"5 cm",hint:"Subtract: 120 − 115 = ?",explanation:"120 − 115 = 5 cm. Sara is 5 centimetres taller.",qformat:"real_world"},
+        {type:"mc",text:"A jug holds 2 litres of water. A cup holds 250 ml. How many cups fill the jug?",opts:["4","6","8","10"],answer:"8",hint:"2 litres = 2000 ml. 2000 ÷ 250 = ?",explanation:"2000 ml ÷ 250 ml = 8 cups.",qformat:"real_world"}
       ]
     },
     "Grade 2": {
@@ -986,17 +1114,92 @@ const QB = {
   geography: {
     "Grade 1": {
       "Continents & Oceans": [
-        {type:"mc",text:"How many continents are there on Earth?",opts:["5","6","7","8"],answer:"7",hint:"Count: Africa, Antarctica, Asia, Australia/Oceania, Europe, North America, South America.",explanation:"There are 7 continents: Africa, Antarctica, Asia, Australia, Europe, North America, South America."},
-        {type:"tf",text:"The Pacific Ocean is the largest ocean on Earth.",answer:"true",hint:"The Pacific is so large it covers more area than all land on Earth combined!",explanation:"True! The Pacific Ocean is the world's largest, covering about 1/3 of Earth's surface."},
-        {type:"mc",text:"On which continent is Canada located?",opts:["Europe","Asia","South America","North America"],answer:"North America",hint:"Canada is in the northern part of the Americas — above the USA.",explanation:"Canada is in North America, along with the USA, Mexico, and Central American countries."},
-        {type:"input",text:"What ocean lies between Europe and North America?",answer:"Atlantic",hint:"Think of the word 'Atlantic' — it separates the continents to the east and west.",explanation:"The Atlantic Ocean separates Europe and Africa from North and South America."}
+        {type:"mc",text:"How many continents are there on Earth?",opts:["5","6","7","8"],answer:"7",hint:"Count: Africa, Antarctica, Asia, Australia/Oceania, Europe, North America, South America.",explanation:"There are 7 continents."},
+        {type:"tf",text:"The Pacific Ocean is the largest ocean on Earth.",answer:"true",hint:"The Pacific is so large it covers more area than all land on Earth combined!",explanation:"True! The Pacific Ocean is the world's largest."},
+        {type:"mc",text:"On which continent is Canada located?",opts:["Europe","Asia","South America","North America"],answer:"North America",hint:"Canada is above the USA.",explanation:"Canada is in North America."},
+        {type:"input",text:"What ocean lies between Europe and North America?",answer:"Atlantic",hint:"It separates Europe from the Americas.",explanation:"The Atlantic Ocean."},
+        {type:"mc",text:"Which is the largest continent?",opts:["Africa","Europe","Asia","North America"],answer:"Asia",hint:"It contains China, India, Russia, and many more huge countries.",explanation:"Asia is the largest continent by area and population."},
+        {type:"tf",text:"Australia is both a country and a continent.",answer:"true",hint:"It is the only country that covers an entire continent.",explanation:"True! Australia is the world's smallest continent and its own country."},
+        {type:"mc",text:"How many oceans are there on Earth?",opts:["3","4","5","6"],answer:"5",hint:"Pacific, Atlantic, Indian, Southern, Arctic.",explanation:"There are 5 oceans: Pacific, Atlantic, Indian, Southern, and Arctic.",qformat:"text"}
+      ],
+      "Country Flags": [
+        {type:"mc",text:"The Canadian flag has a red maple leaf. What colour is the background?",opts:["Blue and white","Red and white","Green and white","Red and yellow"],answer:"Red and white",hint:"Think of Canada's national colours.",explanation:"Canada's flag is red and white with a red maple leaf in the centre."},
+        {type:"mc",text:"Which country's flag has a red circle on a white background?",opts:["China","Japan","South Korea","Switzerland"],answer:"Japan",hint:"The red circle represents the sun.",explanation:"Japan's flag (Hinomaru) has a red circle (the sun) on a white background."},
+        {type:"mc",text:"Which flag has stars and stripes?",opts:["Canada","France","United States","United Kingdom"],answer:"United States",hint:"It has 50 stars — one for each state!",explanation:"The US flag has 50 stars and 13 stripes representing the original 13 colonies.",qformat:"image"},
+        {type:"tf",text:"The flag of France has three vertical stripes: blue, white, and red.",answer:"true",hint:"It is called the Tricolore.",explanation:"True! The French flag (Tricolore) has blue, white, and red vertical stripes."},
+        {type:"mc",text:"The flag of Lebanon has a tree in its centre. What kind of tree?",opts:["Palm tree","Cedar tree","Oak tree","Pine tree"],answer:"Cedar tree",hint:"It is a symbol of Lebanon found in the mountains.",explanation:"The Lebanese flag features a green Cedar of Lebanon in the centre.",qformat:"image"}
+      ],
+      "World Capitals": [
+        {type:"mc",text:"What is the capital city of Canada?",opts:["Toronto","Vancouver","Ottawa","Montreal"],answer:"Ottawa",hint:"It is in the province of Ontario, between Toronto and Montreal.",explanation:"Ottawa is Canada's capital city, located in Ontario."},
+        {type:"mc",text:"What is the capital city of France?",opts:["Lyon","Marseille","Paris","Nice"],answer:"Paris",hint:"It has the Eiffel Tower!",explanation:"Paris is the capital of France and one of the world's most visited cities."},
+        {type:"input",text:"What is the capital city of the United States?",answer:"Washington",hint:"It is named after the first US president.",explanation:"Washington D.C. (District of Columbia) is the capital of the United States."},
+        {type:"mc",text:"What is the capital of Lebanon?",opts:["Tripoli","Sidon","Byblos","Beirut"],answer:"Beirut",hint:"It is on the coast of the Mediterranean Sea.",explanation:"Beirut is the capital and largest city of Lebanon."},
+        {type:"mc",text:"What is the capital of the United Kingdom?",opts:["Manchester","Edinburgh","London","Birmingham"],answer:"London",hint:"Big Ben and Buckingham Palace are here.",explanation:"London is the capital of the United Kingdom and England.",qformat:"image"}
+      ],
+      "Countries & Locations": [
+        {type:"mc",text:"Which country is directly south of Canada?",opts:["Mexico","Brazil","United States","Cuba"],answer:"United States",hint:"You can drive across the border.",explanation:"The United States shares a long border directly south of Canada."},
+        {type:"mc",text:"On which continent is Brazil located?",opts:["Africa","Asia","Europe","South America"],answer:"South America",hint:"Brazil is the largest country in South America.",explanation:"Brazil is in South America and is the largest country on that continent."},
+        {type:"tf",text:"China is located in Asia.",answer:"true",hint:"Asia is the largest continent.",explanation:"True! China is in eastern Asia and is the world's most populous country."},
+        {type:"mc",text:"Which ocean would you cross to get from Canada to Europe?",opts:["Pacific","Indian","Arctic","Atlantic"],answer:"Atlantic",hint:"Europe is to the east of North America.",explanation:"The Atlantic Ocean lies between North America and Europe.",qformat:"map"}
+      ],
+      "General Geography Knowledge": [
+        {type:"mc",text:"What do we call a large area of salt water?",opts:["River","Lake","Ocean","Pond"],answer:"Ocean",hint:"It covers most of Earth's surface.",explanation:"Oceans are huge bodies of salt water covering about 71% of Earth."},
+        {type:"mc",text:"What is the tallest mountain in the world?",opts:["Mount Logan","Mount Fuji","Mount Everest","Mont Blanc"],answer:"Mount Everest",hint:"It is in the Himalayas between Nepal and Tibet.",explanation:"Mount Everest is 8,849 metres tall — the highest point on Earth."},
+        {type:"tf",text:"The equator is an imaginary line that divides Earth into North and South.",answer:"true",hint:"Countries near the equator are usually very warm.",explanation:"True! The equator is 0° latitude and divides Earth into Northern and Southern hemispheres."},
+        {type:"input",text:"What is the name of the imaginary line that divides Earth into East and West hemispheres?",answer:"Prime Meridian",hint:"It passes through Greenwich, England.",explanation:"The Prime Meridian is 0° longitude and divides Earth into Eastern and Western hemispheres."}
       ]
     },
     "Grade 3": {
       "Physical Features of Canada": [
-        {type:"mc",text:"What is the name of the large rocky region that covers much of central and eastern Canada?",opts:["Rocky Mountains","Canadian Shield","Interior Plains","Hudson Bay Lowlands"],answer:"Canadian Shield",hint:"This ancient rock formation is shaped like a shield and is one of the oldest rock formations on Earth.",explanation:"The Canadian Shield is a vast region of ancient rock covering about half of Canada's land area."},
-        {type:"mc",text:"Which mountain range runs along the western edge of Canada?",opts:["Appalachians","Rockies","Laurentians","Himalayas"],answer:"Rockies",hint:"These mountains form the border between Alberta and British Columbia.",explanation:"The Rocky Mountains (Rockies) run along western Canada, forming a natural border between AB and BC."},
-        {type:"tf",text:"The Great Lakes are the world's largest group of freshwater lakes.",answer:"true",hint:"Lakes Superior, Michigan, Huron, Erie, and Ontario together form the largest freshwater system.",explanation:"True! The Great Lakes (HOMES: Huron, Ontario, Michigan, Erie, Superior) are the world's largest freshwater system."}
+        {type:"mc",text:"What is the name of the large rocky region that covers much of central and eastern Canada?",opts:["Rocky Mountains","Canadian Shield","Interior Plains","Hudson Bay Lowlands"],answer:"Canadian Shield",hint:"This ancient rock formation is shaped like a shield.",explanation:"The Canadian Shield is a vast region of ancient rock."},
+        {type:"mc",text:"Which mountain range runs along the western edge of Canada?",opts:["Appalachians","Rockies","Laurentians","Himalayas"],answer:"Rockies",hint:"These mountains border Alberta and British Columbia.",explanation:"The Rocky Mountains run along western Canada."},
+        {type:"tf",text:"The Great Lakes are the world's largest group of freshwater lakes.",answer:"true",hint:"Lakes Superior, Michigan, Huron, Erie, and Ontario — HOMES!",explanation:"True! The Great Lakes form the largest freshwater system."},
+        {type:"mc",text:"Which of these rivers flows through central Canada and empties into the Atlantic Ocean?",opts:["Fraser River","Mackenzie River","St. Lawrence River","Saskatchewan River"],answer:"St. Lawrence River",hint:"It connects the Great Lakes to the Atlantic and passes through Quebec City.",explanation:"The St. Lawrence River is Canada's most important river for trade and history.",qformat:"map"},
+        {type:"mc",text:"Look at this list of regions:
+📍 Prairies — flat, wheat farms
+📍 Canadian Shield — rocky, forests
+📍 Rockies — mountains, glaciers
+📍 Maritimes — coast, fishing
+
+Which region is best for wheat farming?",opts:["Canadian Shield","Rockies","Prairies","Maritimes"],answer:"Prairies",hint:"Flat land is best for growing crops.",explanation:"The Prairies (Alberta, Saskatchewan, Manitoba) are flat and fertile — perfect for wheat.",qformat:"table"}
+      ],
+      "World Regions": [
+        {type:"mc",text:"Which continent is the Amazon Rainforest in?",opts:["Africa","Asia","South America","Australia"],answer:"South America",hint:"The Amazon River runs through it.",explanation:"The Amazon Rainforest is in South America, mostly in Brazil."},
+        {type:"mc",text:"The Sahara is the world's largest hot desert. On which continent is it?",opts:["Asia","South America","Australia","Africa"],answer:"Africa",hint:"It covers most of North Africa.",explanation:"The Sahara Desert covers much of North Africa.",qformat:"map"},
+        {type:"tf",text:"Europe and Asia are on the same landmass.",answer:"true",hint:"Together they form 'Eurasia'.",explanation:"True! Europe and Asia share the same landmass, called Eurasia."},
+        {type:"mc",text:"Which country has the most people in the world?",opts:["USA","Russia","India","China"],answer:"India",hint:"India recently passed China as the most populous country.",explanation:"India now has over 1.4 billion people, making it the world's most populous country."}
+      ],
+      "Country Flags": [
+        {type:"mc",text:"Which country's flag is a red maple leaf on red and white?",opts:["United States","Canada","United Kingdom","Australia"],answer:"Canada",hint:"The maple leaf is a Canadian symbol.",explanation:"Canada's flag has a red maple leaf on a white centre with red sides.",qformat:"image"},
+        {type:"mc",text:"The flag of Brazil is green with a yellow diamond and a blue globe. What does the blue globe contain?",opts:["A cross","Stars","A sun","An eagle"],answer:"Stars",hint:"There are 27 stars — one for each Brazilian state.",explanation:"Brazil's flag has 27 stars on the blue globe, representing its states.",qformat:"image"},
+        {type:"mc",text:"Which European country has a flag with just two colours: red and white, in a horizontal cross?",opts:["France","Switzerland","Germany","Italy"],answer:"Switzerland",hint:"Switzerland is known for its neutrality and the Red Cross symbol.",explanation:"Switzerland's flag is a red square with a white cross."},
+        {type:"tf",text:"The United Kingdom's flag is called the Union Jack.",answer:"true",hint:"It combines the flags of England, Scotland, and Ireland.",explanation:"True! The Union Jack combines three crosses representing England, Scotland, and Ireland.",qformat:"image"}
+      ],
+      "World Capitals": [
+        {type:"mc",text:"What is the capital of Japan?",opts:["Osaka","Kyoto","Hiroshima","Tokyo"],answer:"Tokyo",hint:"It is the largest city in the world by population.",explanation:"Tokyo is Japan's capital and the world's largest metropolitan area."},
+        {type:"mc",text:"What is the capital of Australia?",opts:["Sydney","Melbourne","Canberra","Brisbane"],answer:"Canberra",hint:"It is NOT Sydney — a smaller city was chosen as capital.",explanation:"Canberra is Australia's capital. Sydney and Melbourne both wanted to be capital, so a new city was built.",qformat:"map"},
+        {type:"input",text:"What is the capital of Egypt?",answer:"Cairo",hint:"It is near the famous Pyramids of Giza.",explanation:"Cairo is Egypt's capital and Africa's largest city."},
+        {type:"mc",text:"What is the capital of Germany?",opts:["Munich","Frankfurt","Hamburg","Berlin"],answer:"Berlin",hint:"It was divided into East and West during the Cold War.",explanation:"Berlin is Germany's capital and largest city, reunified in 1990."}
+      ],
+      "Countries & Locations": [
+        {type:"mc",text:"Look at this table of countries and their continents:
+| Country | Continent |
+|---------|----------|
+| Egypt | Africa |
+| Brazil | South America |
+| Japan | Asia |
+| France | Europe |
+
+On which continent is Japan?",opts:["Africa","Europe","Asia","South America"],answer:"Asia",hint:"Use the table above.",explanation:"According to the table, Japan is in Asia.",qformat:"table"},
+        {type:"mc",text:"Which country shares the longest border with Canada?",opts:["Russia","Mexico","Greenland","United States"],answer:"United States",hint:"They share the world's longest undefended border.",explanation:"The US-Canada border is the world's longest international border at 8,891 km.",qformat:"map"},
+        {type:"tf",text:"Russia is the largest country in the world by area.",answer:"true",hint:"It stretches across 11 time zones!",explanation:"True! Russia covers about 17 million km², making it the world's largest country."},
+        {type:"mc",text:"Which ocean is between Africa and Australia?",opts:["Atlantic","Pacific","Arctic","Indian"],answer:"Indian",hint:"It is named after the country of India.",explanation:"The Indian Ocean lies between Africa, Asia, and Australia."}
+      ],
+      "General Geography Knowledge": [
+        {type:"mc",text:"A cartographer is a person who makes:",opts:["Globes","Maps","Compasses","Telescopes"],answer:"Maps",hint:"'Carto' comes from Latin for map.",explanation:"A cartographer is a mapmaker. Cartography is the science of making maps."},
+        {type:"mc",text:"What is the imaginary line at 0° latitude called?",opts:["Prime Meridian","Arctic Circle","Tropic of Cancer","Equator"],answer:"Equator",hint:"Countries near this line are hot and tropical.",explanation:"The Equator is at 0° latitude and divides Earth into Northern and Southern hemispheres."},
+        {type:"tf",text:"A peninsula is land surrounded by water on all sides.",answer:"false",hint:"An island is surrounded on ALL sides. A peninsula is surrounded on THREE sides.",explanation:"False! A peninsula is surrounded by water on three sides. An island is surrounded on all sides."},
+        {type:"mc",text:"What does the compass rose on a map show?",opts:["Scale","Population","Directions","Elevation"],answer:"Directions",hint:"It shows North, South, East, and West.",explanation:"A compass rose shows the cardinal directions (N, S, E, W) and often the in-between directions too.",qformat:"image"}
       ]
     }
   },
@@ -1047,22 +1250,47 @@ async function genQ(idx) {
   const lang = getLang(idx);
   const subj = SUBJECTS.find(s => s.id === cfg.subject);
   const grade = currentChild?.grade || 'Grade 1';
-  const topic = cfg.topics[idx % cfg.topics.length];
+  // Even distribution: build a shuffled queue across all topics
+  if(!window._topicQueue||window._topicQueue._cfg!==cfg.topics.join('|')){
+    // Rebuild queue when topics change
+    const tq=[];
+    for(let i=0;i<Math.max(cfg.count,cfg.topics.length*3);i++)tq.push(cfg.topics[i%cfg.topics.length]);
+    // Shuffle
+    for(let i=tq.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[tq[i],tq[j]]=[tq[j],tq[i]];}
+    window._topicQueue={queue:tq,_cfg:cfg.topics.join('|')};
+  }
+  const topic = window._topicQueue.queue[idx % window._topicQueue.queue.length];
   
-  // Try question bank first
+  // Try question bank first — bank questions are always English
   const bankQ = getQFromBank(cfg.subject, topic, grade, idx, _usedQIndices);
   if (bankQ) {
     return {
       ...bankQ,
       topic,
-      lang,
+      lang: 'en',  // bank questions are always English regardless of lang setting
       examMode: cfg.mode === 'exam',
       userCorrect: null
     };
   }
   
+  // Try AI cache (questions generated in previous sessions)
+  const cachedQ = getAICachedQ(cfg.subject, topic, grade, _usedQIndices);
+  if (cachedQ) return {...cachedQ, topic, lang:'en', examMode:cfg.mode==='exam', userCorrect:null};
+
   // Fallback: generate via AI if bank has no questions for this combination
-  return await genQFromAI(idx, lang, subj, grade, topic);
+  try {
+    return await genQFromAI(idx, lang, subj, grade, topic);
+  } catch(e) {
+    console.warn('AI gen failed for', topic, e.message);
+    // Pull any available bank question for same subject/grade (different topic is fine)
+    const subjBank = QB[cfg.subject]||{};
+    const gradeBank = subjBank[grade]||{};
+    for (const t of Object.keys(gradeBank)) {
+      const q = getQFromBank(cfg.subject, t, grade, idx, _usedQIndices);
+      if (q) return {...q, topic:t, lang, examMode:cfg.mode==='exam', userCorrect:null};
+    }
+    return null;
+  }
 }
 
 async function genQFromAI(idx, lang, subj, grade, topic) {
@@ -1078,7 +1306,25 @@ async function genQFromAI(idx, lang, subj, grade, topic) {
     ? 'Multiple choice — exactly 4 options (A,B,C,D), make distractors plausible.'
     : qType === 'input' ? 'Short answer — a specific word, number, or short phrase.'
     : 'True/False — make it thoughtful, not obviously true/false.';
-  const diff = gNum <= 2 ? 'concrete & relatable' : gNum <= 4 ? 'requires understanding' : 'analytical, apply knowledge';
+  // Rotate question formats for variety
+  const fmtOpts = ['text','text','text','real_world','table','chart','map','image'];
+  const qformat = fmtOpts[(idx + Math.floor(Math.random()*3)) % fmtOpts.length];
+  const fmtInstr = qformat === 'real_world' ? 'Frame as a real-world scenario or story problem.'
+    : qformat === 'table' ? 'Include a simple ASCII/emoji table in the question text for the child to read.'
+    : qformat === 'chart' ? 'Describe a simple bar or tally chart using | symbols or numbers in the question text.'
+    : qformat === 'map' ? 'Describe a simple map scenario using compass directions or landmark positions.'
+    : qformat === 'image' ? 'Describe a visual scene or diagram in words, then ask about it.'
+    : 'Standard text question.';
+  const mastery = getMasteryLevel(cfg.subject, topic);
+  const lvl = mastery.level;
+  const diffMap = {
+    1: 'Level 1 — basic recall, simple facts, direct questions',
+    2: 'Level 2 — understanding, slightly more complex',
+    3: 'Level 3 — application, use knowledge in a new context',
+    4: 'Level 4 — analysis, compare or explain why',
+    5: 'Level 5 — challenging, multi-step, requires deep understanding'
+  };
+  const diff = diffMap[lvl] || diffMap[1];
   const prevQs = sessionQs.map(q => q.text).slice(-5).join(' | ');
   const sys = 'You are Lumo, a curriculum-aligned educational AI. Return ONLY valid JSON — no markdown.';
   const prompt = `Generate ONE ${langLabel} question for Grade ${gNum} students.
@@ -1089,10 +1335,13 @@ Type: ${typeInstr}
 Difficulty: ${diff}
 ${cfg.mode === 'exam' ? 'EXAM MODE.' : 'PRACTICE MODE — include hint.'}
 Avoid repeating: [${prevQs}]
-JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B","C","D"],' : ''}"answer":"...","hint":"...","explanation":"..."}`;
+JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B","C","D"],' : ''}"answer":"...","hint":"...","explanation":"...","qformat":"${qformat}"}
+Format instruction: ${fmtInstr}
+Keep question text age-appropriate and clear for Grade ${gNum}.`;
   try {
     const raw = await claudeAsk(prompt, sys);
     const parsed = JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g, '').trim());
+    cacheAIQuestion(cfg.subject, topic, grade, parsed);
     return { ...parsed, topic, lang, examMode: cfg.mode === 'exam', userCorrect: null };
   } catch(e) {
     // If AI fails, try one more time with a simpler prompt
@@ -1126,7 +1375,9 @@ function renderQ(q){
   document.getElementById('q-subj-badge').textContent=(subj?.emoji||'')+' '+(subj?.label||'');
   document.getElementById('q-lang-badge').textContent=q.lang==='fr'?'🇫🇷 Français':q.lang==='ar'?'📜 عربي':'🇨🇦 English';
   document.getElementById('q-exam-badge').classList.toggle('hidden',!q.examMode);
-  document.getElementById('q-type-badge').textContent={mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type;
+  const fmtLabels={real_world:'🌍 Real World',table:'📊 Table',chart:'📈 Chart',map:'🗺️ Map',image:'🖼️ Visual',text:''};
+  const fmtLabel=fmtLabels[q.qformat]||'';
+  document.getElementById('q-type-badge').textContent=({mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type)+(fmtLabel?' · '+fmtLabel:'');
   document.getElementById('q-text').textContent=q.text;
   document.getElementById('q-text').style.direction=q.lang==='ar'?'rtl':'ltr';
   document.getElementById('q-mc').innerHTML='';
@@ -1158,7 +1409,8 @@ function renderQ(q){
 function submitMC(choice,btn,q){
   if(sessAnswered)return;sessAnswered=true;
   const correct=choice.trim()===String(q.answer).trim();
-  q.userCorrect=correct;q.userAnswer=choice;
+  q.userCorrect=correct;
+  if(cfg.subject&&q.topic)updateMastery(cfg.subject,q.topic,correct);q.userAnswer=choice;
   document.querySelectorAll('.opt-btn').forEach(b=>{
     b.disabled=true;
     const bText=b.textContent.replace(/^[A-D]\. /,'');
@@ -1212,10 +1464,11 @@ async function endSession(){
     await sbFetchSafe('children?id=eq.'+currentChild.id,{method:'PATCH',body:JSON.stringify({stars:currentChild.stars})});
     allChildren=allChildren.map(c=>c.id===currentChild.id?{...c,stars:currentChild.stars}:c);
     const subj=SUBJECTS.find(s=>s.id===cfg.subject);
-    const wrongForDB=sessionQs.filter(q=>!q.userCorrect).map(q=>({text:q.text||'',"type":q.type||'',"userAnswer":q.userAnswer??'',"answer":Array.isArray(q.answer)?q.answer.join(', '):String(q.answer??''),"explanation":q.explanation||'',"topic":q.topic||''}));
+    const wrongForDB=sessionQs.filter(q=>!q.userCorrect).map(q=>({text:q.text||'',"type":q.type||'',"qformat":q.qformat||'text',"userAnswer":q.userAnswer??'',"answer":Array.isArray(q.answer)?q.answer.join(', '):String(q.answer??''),"explanation":q.explanation||'',"topic":q.topic||''}));
     const topicSummary=(cfg.topics&&cfg.topics.length)?cfg.topics.join(' • '):(cfg.topic||'');
+    const allQsForDB=sessionQs.map(q=>({text:q.text||'',type:q.type||'mc',qformat:q.qformat||'text',topic:q.topic||'',correct:!!q.userCorrect}));
     const sessId='sess_'+Date.now()+'_'+Math.floor(Math.random()*9999);
-    await sbFetchSafe('sessions',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:sessId,child_id:currentChild.id,date:new Date().toISOString().split('T')[0],subject:subj?.label||cfg.subject,topic:topicSummary,score:correct,total:total,duration:Math.floor(12+Math.random()*8),wrong_questions:JSON.stringify(wrongForDB),mode:cfg.mode,lang:cfg.lang==='fr'?'Français':cfg.lang==='ar'?'عربي':'English'})});
+    await sbFetchSafe('sessions',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:sessId,child_id:currentChild.id,date:new Date().toISOString().split('T')[0],subject:subj?.label||cfg.subject,topic:topicSummary,score:correct,total:total,duration:Math.floor(12+Math.random()*8),wrong_questions:JSON.stringify(wrongForDB),all_questions:JSON.stringify(allQsForDB),mode:cfg.mode,lang:cfg.lang==='fr'?'Français':cfg.lang==='ar'?'عربي':'English'})});
   }
   document.getElementById('res-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('res-score').textContent=score+'/10';
@@ -1319,18 +1572,23 @@ function showDashTab(tab){
 async function renderDashOverview(el){
   const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
+    // Always refresh children list so star/session counts are current
+    const freshKids=await sbFetchSafe('children?select=*&order=created_at.asc');
+    if(freshKids&&freshKids.length)allChildren=freshKids;
     const [sugs,childData]=await Promise.all([sbFetchSafe('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc'),Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}))]);
     const pending=(sugs||[]).filter(s=>s.status==='pending');
     el.innerHTML=`
       ${pending.length?`<div style="background:var(--yl);border:1px solid #FCD34D;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:800;font-size:13px;color:#92400E;margin-bottom:8px">🔔 ${pending.length} ${L?'suggestion(s)':'pending suggestion(s)'}</div>${pending.map(s=>`<div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:7px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">${s.children?.name||''}: ${s.text}</div><div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" onclick="approveS('${s.id}')">✓ ${L?'Approuver':'Approve'}</button><button class="btn btn-sm btn-danger" onclick="rejectS('${s.id}')">✗ ${L?'Rejeter':'Reject'}</button></div></div>`).join('')}</div>`:''}
       <div class="section-title">${L?'Résumé':'Overview'}</div>
-      ${childData.map(({c,sessions})=>{const avg=sessions.length?Math.round(sessions.reduce((a,s)=>a+s.score,0)/sessions.length*10)/10:0;const last=sessions[0];return`<div class="card hov" style="margin-bottom:12px" onclick="showDashTab('analytics')"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><span style="font-weight:800;color:#D97706;font-size:15px">⭐${c.stars}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Sessions</div><div style="font-weight:800;color:var(--p)">${sessions.length}</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Moy.':'Avg'}</div><div style="font-weight:800;color:var(--g)">${avg}/10</div></div><div style="text-align:center;background:var(--yl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Badges</div><div style="font-weight:800;color:#D97706">${(typeof c.badges==='string'?JSON.parse(c.badges||'[]'):(c.badges||[])).filter(b=>b.earned).length}</div></div></div>${last?`<div style="margin-top:8px;font-size:11px;color:var(--mu);font-weight:600">Last: ${last.date} — ${last.subject} ${last.score}/10</div>`:''}</div>`;}).join('')}`;
+      ${childData.map(({c,sessions})=>{const avg=sessions.length?Math.round(sessions.reduce((a,s)=>a+s.score,0)/sessions.length*10)/10:0;const last=sessions[0];return`<div class="card hov" style="margin-bottom:12px" onclick="showDashTab('analytics')"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><span style="font-weight:800;color:#D97706;font-size:15px">⭐${c.stars}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Sessions</div><div style="font-weight:800;color:var(--p)">${sessions.length}</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Moy.':'Avg'}</div><div style="font-weight:800;color:var(--g)">${avg}/10</div></div><div style="text-align:center;background:var(--yl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Badges</div><div style="font-weight:800;color:#D97706">${getBadgeDisplay(c).filter(b=>b.earned).length}</div></div></div>${last?`<div style="margin-top:8px;font-size:11px;color:var(--mu);font-weight:600">Last: ${last.date} — ${last.subject} ${last.score}/10</div>`:''}</div>`;}).join('')}`;
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load data.</div>';}
 }
 
 async function renderDashAnalytics(el){
   const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
+    const freshKids=await sbFetchSafe('children?select=*&order=created_at.asc');
+    if(freshKids&&freshKids.length)allChildren=freshKids;
     const cards=await Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}));
     el.innerHTML=cards.map(({c,sessions})=>{
       const bySubj={};sessions.forEach(s=>{if(!bySubj[s.subject])bySubj[s.subject]=[];bySubj[s.subject].push(s.score);});
@@ -1338,8 +1596,37 @@ async function renderDashAnalytics(el){
       <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Score par matière':'Score by Subject'}</div>
       ${Object.entries(bySubj).map(([subj,scores])=>{const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*10)/10;return`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;font-weight:700">${subj}</span><span style="font-size:12px;font-weight:800;color:var(--p)">${avg}/10</span></div><div class="progress-wrap"><div class="progress-fill" style="width:${avg/10*100}%"></div></div></div>`;}).join('')}
       <div class="divider"></div>
-      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Performance par type':'Performance by Question Type'}</div>
-      ${(()=>{const qt={};sessions.forEach(s=>{try{const w=JSON.parse(s.wrong_questions||'[]');w.forEach(q=>{const t=q.type||'mc';qt[t]=(qt[t]||{wrong:0,total:0});qt[t].wrong++;qt[t].total++;});const correctT=Math.max(0,(s.score||0));const dummies=['mc','mc','input','tf'];for(let i=0;i<correctT;i++){const t=dummies[i%dummies.length];qt[t]=(qt[t]||{wrong:0,total:0});qt[t].total++;}}catch(e){}});const labels={'mc':L?'Choix multiple':'Multiple Choice','input':L?'Réponse courte':'Short Answer','tf':'True / False'};return Object.keys(qt).length?Object.entries(qt).map(([t,d])=>{const acc=d.total?Math.round((1-(d.wrong/d.total))*100):100;const label=labels[t]||t;return`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;font-weight:700">${label}</span><span style="font-size:12px;font-weight:800;color:${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}">${acc}%</span></div><div class="progress-wrap"><div class="progress-fill" style="width:${acc}%;background:${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}"></div></div></div>`;}).join(''):'<div style="font-size:12px;color:var(--mu);font-weight:700">No data yet.</div>';})()}
+      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Performance par type':'Performance by Question Type & Format'}</div>
+      ${(()=>{
+        const qt={};const qf={};const topicStats={};
+        sessions.forEach(s=>{
+          try{
+            const allQs=JSON.parse(s.all_questions||'[]');
+            const wrongQs=JSON.parse(s.wrong_questions||'[]');
+            const wrongTexts=new Set(wrongQs.map(w=>w.text));
+            (allQs.length?allQs:wrongQs.map(w=>({...w,correct:false}))).forEach(q=>{
+              const t=q.type||'mc';
+              qt[t]=qt[t]||{correct:0,total:0};
+              qt[t].total++;
+              if(q.correct)qt[t].correct++;
+              const f=q.qformat||'text';
+              qf[f]=qf[f]||{correct:0,total:0};
+              qf[f].total++;
+              if(q.correct)qf[f].correct++;
+              const top=q.topic||s.topic||'';
+              if(top){topicStats[top]=topicStats[top]||{correct:0,total:0};topicStats[top].total++;if(q.correct)topicStats[top].correct++;}
+            });
+            if(!allQs.length){wrongQs.forEach(w=>{const t=w.type||'mc';qt[t]=qt[t]||{correct:0,total:0};qt[t].total++;const top=w.topic||s.topic||'';if(top){topicStats[top]=topicStats[top]||{correct:0,total:0};topicStats[top].total++;}});}
+          }catch(e){}
+        });
+        const typeLabels={'mc':'Multiple Choice','input':'Fill-in-the-blank','tf':'True / False'};
+        const fmtLabels2={'text':'Text Questions','real_world':'🌍 Real World','table':'📊 Tables','chart':'📈 Charts','map':'🗺️ Maps','image':'🖼️ Visual'};
+        const renderBar=(label,stats)=>{const acc=stats.total?Math.round(stats.correct/stats.total*100):0;return \`<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:11px;font-weight:700">\${label}</span><span style="font-size:11px;font-weight:800;color:\${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}">\${acc}% (\${stats.correct}/\${stats.total})</span></div><div class="progress-wrap"><div class="progress-fill" style="width:\${acc}%;background:\${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}"></div></div></div>\`;};
+        const typeHTML=Object.keys(qt).length?Object.entries(qt).map(([t,d])=>renderBar(typeLabels[t]||t,d)).join(''):'<div style="font-size:11px;color:var(--mu)">No data yet.</div>';
+        const fmtHTML=Object.keys(qf).filter(f=>f!=='text'&&qf[f].total>0).length?Object.entries(qf).filter(([f])=>f!=='text').map(([f,d])=>renderBar(fmtLabels2[f]||f,d)).join(''):'';
+        const topicHTML=Object.keys(topicStats).length?\`<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">Performance by Topic</div>\${Object.entries(topicStats).sort((a,b)=>b[1].total-a[1].total).slice(0,8).map(([t,d])=>renderBar(t,d)).join('')}\`:'';
+        return typeHTML+(fmtHTML?\`<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">By Question Format</div>\${fmtHTML}\`:'')+topicHTML;
+      })()}
       <div class="divider"></div>
       <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Journal':'Session Log'}</div>
       <div style="overflow-x:auto"><table style="width:100%;font-size:11px;border-collapse:collapse">
@@ -1351,46 +1638,52 @@ async function renderDashAnalytics(el){
 
 function showSessionDetail(s){
   let wrong=[];try{wrong=JSON.parse(s.wrong_questions||'[]');}catch(e){}
+  let allQs=[];try{allQs=JSON.parse(s.all_questions||'[]');}catch(e){}
   const goodCount=(s.score||0);
   const totalQ=s.total||10;
-  const wrongCount=Math.max(0,totalQ-goodCount);
-  const hasDetailed=wrong.some(w=>w && (w.text||w.answer||w.userAnswer||w.explanation));
+  // Build per-question display: use all_questions if available, else wrong_questions
+  const qRows = allQs.length ? allQs : wrong.map(w=>({...w,correct:false}));
+  const typeLabels={mc:'MC',input:'Fill-in',tf:'T/F'};
+  const fmtLabels={real_world:'🌍 Real World',table:'📊 Table',chart:'📈 Chart',map:'🗺️ Map',image:'🖼️ Visual',text:'Text'};
   const html=`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
       <div style="flex:1">
-        <div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${s.subject||''} — ${s.topic||''}</div>
-        <div style="font-size:11px;color:var(--mu);font-weight:700">${s.date||''} • ${s.duration||''}min • ${s.mode||'practice'} mode</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--p)">${s.subject||''} — ${s.topic||''}</div>
+        <div style="font-size:11px;color:var(--mu);font-weight:700">${s.date||''} • ${s.duration||''}min • ${s.mode||'practice'}</div>
       </div>
       <div style="font-family:'Fredoka One',cursive;font-size:26px;color:${goodCount>=8?'var(--g)':goodCount>=6?'#D97706':'var(--r)'}">${goodCount}/${totalQ}</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <div class="card card-sm" style="text-align:center;background:var(--gl)">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
+      <div style="text-align:center;background:var(--gl);border-radius:9px;padding:8px">
         <div style="font-size:10px;font-weight:700;color:var(--mu)">✅ Correct</div>
         <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g)">${goodCount}</div>
       </div>
-      <div class="card card-sm" style="text-align:center;background:var(--rl)">
-        <div style="font-size:10px;font-weight:700;color:var(--mu)">❌ Mistakes</div>
-        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--r)">${wrongCount}</div>
+      <div style="text-align:center;background:var(--rl);border-radius:9px;padding:8px">
+        <div style="font-size:10px;font-weight:700;color:var(--mu)">❌ Wrong</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--r)">${Math.max(0,totalQ-goodCount)}</div>
+      </div>
+      <div style="text-align:center;background:var(--bl);border-radius:9px;padding:8px">
+        <div style="font-size:10px;font-weight:700;color:var(--mu)">📊 Score</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--b)">${Math.round(goodCount/totalQ*100)}%</div>
       </div>
     </div>
-    ${wrong.length && hasDetailed ? `
-      <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">❌ Wrong Answers Review</div>
-      <div style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto">
-        ${wrong.map((w,i)=>`
-          <div style="background:var(--rl);border-radius:11px;padding:11px 13px">
-            <div style="font-size:12px;font-weight:800;margin-bottom:5px;color:var(--tx)">Q${i+1}: ${w.text||'Question not saved'}</div>
-            <div style="font-size:11px;color:#991B1B;font-weight:700;margin-bottom:2px">Your answer: ${String(w.userAnswer ?? '—') || '—'}</div>
-            <div style="font-size:11px;color:var(--g);font-weight:800;margin-bottom:2px">✓ Correct: ${String(w.answer ?? '—') || '—'}</div>
-            ${w.explanation?`<div style="font-size:11px;color:var(--mu);margin-top:4px;line-height:1.45">${w.explanation}</div>`:''}
-          </div>`).join('')}
-      </div>
-    ` : wrong.length ? `
-      <div style="background:var(--yl);border-radius:12px;padding:12px 14px;font-size:12px;font-weight:700;color:#92400E;line-height:1.45">
-        Detailed wrong-answer content was not saved for this older session. New sessions will now store the question, the child's answer, and the correct answer.
-      </div>
-    ` : `
-      <div style="text-align:center;padding:16px;font-weight:700;color:var(--g);font-size:14px">🌟 Perfect session — no mistakes!</div>
-    `}
+    ${qRows.length ? `
+    <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">📋 Full Question Breakdown</div>
+    <div style="display:flex;flex-direction:column;gap:7px;max-height:360px;overflow-y:auto">
+      ${qRows.map((q,i)=>{
+        const wDetail=wrong.find(w=>w.text===q.text)||{};
+        return \`<div style="background:\${q.correct?'var(--gl)':'var(--rl)'};border-radius:10px;padding:10px 12px;border-left:3px solid \${q.correct?'var(--g)':'var(--r)'}">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-size:14px">\${q.correct?'✅':'❌'}</span>
+            <span class="badge badge-p" style="font-size:9px">\${typeLabels[q.type]||q.type||'MC'}</span>
+            \${q.qformat&&q.qformat!=='text'?\`<span class="badge badge-b" style="font-size:9px">\${fmtLabels[q.qformat]||q.qformat}</span>\`:''}
+            <span style="font-size:9px;font-weight:700;color:var(--mu)">\${q.topic||''}</span>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:3px">\${(q.text||'').slice(0,120)}\${(q.text||'').length>120?'...':''}</div>
+          \${!q.correct&&wDetail.answer?\`<div style="font-size:11px;color:#991B1B;font-weight:600">Your answer: \${String(wDetail.userAnswer??'—')}</div><div style="font-size:11px;color:var(--g);font-weight:700">✓ Correct: \${String(wDetail.answer??'—')}</div>\${wDetail.explanation?\`<div style="font-size:10px;color:var(--mu);margin-top:2px">\${wDetail.explanation}</div>\`:''}':\`\`}
+        </div>\`;
+      }).join('')}
+    </div>` : '<div style="text-align:center;padding:12px;font-weight:700;color:var(--g)">🌟 Perfect session!</div>'}
     <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="hideModal()">Close</button>
   `;
   showModal(html);
@@ -1450,7 +1743,7 @@ function filterCurriculumTopics(){
         <div style="font-size:10px;color:var(--mu);font-weight:600">${r.subjLabel} • ${r.grade}</div>
       </div>
       <div style="display:flex;gap:5px;flex-shrink:0">
-        ${allChildren.map(c=>`<button class="btn btn-sm" style="font-size:10px;padding:4px 8px;background:var(--pl);color:var(--p);border:none;border-radius:7px" onclick="assignTopicToChild('${c.id}','${c.name}','${r.topic}','${r.subjLabel}','${r.grade}')" title="Add to ${c.name}">${c.mascot}</button>`).join('')}
+        ${allChildren.map(c=>`<button class="btn btn-sm" style="font-size:10px;padding:4px 8px;background:var(--pl);color:var(--p);border:none;border-radius:7px" onclick="assignTopicToChild('${c.id}','${c.name}','${r.topic}','${r.subjId}','${r.grade}')" title="Add to ${c.name}">${c.mascot}</button>`).join('')}
       </div>
     </div>`).join('')+(results.length>60?`<div style="text-align:center;color:var(--mu);font-size:11px;font-weight:700;padding:8px">Refine your search to see more results (${results.length} total)</div>`:'');
 }
@@ -1458,7 +1751,7 @@ function assignTopicToChild(childId,childName,topic,subject,grade){
   showModal(`
     <h3 style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p);margin-bottom:8px">📌 Assign Topic</h3>
     <p style="font-size:13px;font-weight:700;margin-bottom:4px">Add <strong>${topic}</strong> to <strong>${childName}</strong>?</p>
-    <p style="font-size:12px;color:var(--mu);font-weight:600;margin-bottom:16px">${subject} • ${grade}</p>
+    <p style="font-size:12px;color:var(--mu);font-weight:600;margin-bottom:16px">${(SUBJECTS.find(s=>s.id===subject)||{label:subject}).label} • ${grade}</p>
     <div style="display:flex;gap:8px">
       <button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button>
       <button class="btn btn-primary" style="flex:1" onclick="confirmAssignTopic('${childId}','${childName}','${topic}','${subject}','${grade}')">✓ Assign</button>
