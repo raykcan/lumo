@@ -478,6 +478,7 @@ async function init(){
   }catch(e){console.error('Init error:',e);}
   finally{clearTimeout(timeout);showLandingButtons();}
 }
+init();
 
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id)?.classList.add('active');}
 function toast(m,d=2600){const t=document.getElementById('toast');t.textContent=m;t.style.transform='translateX(-50%) translateY(0)';setTimeout(()=>t.style.transform='translateX(-50%) translateY(100px)',d);}
