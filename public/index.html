@@ -399,10 +399,11 @@ const SB_KEY='sb_publishable_jknkJ-FqbDUdKjU3UfECnQ_-kxIGhoU';
 const CLAUDE_MODEL='claude-sonnet-4-20250514';
 
 async function sbFetch(path,opts={}){
-  const r=await fetch(SB_URL+'/rest/v1/'+path,{
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
-    ...opts
-  });
+  // Build headers: defaults first, then opts.headers overrides them (fixes Prefer: return=minimal not working)
+  const defaultHeaders={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+  const mergedHeaders={...defaultHeaders,...(opts.headers||{})};
+  const {headers:_h,...restOpts}=opts;
+  const r=await fetch(SB_URL+'/rest/v1/'+path,{headers:mergedHeaders,...restOpts});
   if(!r.ok){const e=await r.text();throw new Error(e);}
   return r.status===204?null:await r.json();
 }
@@ -457,16 +458,23 @@ async function sbFetchSafe(path,opts={}){try{return await sbFetch(path,opts);}ca
 
 async function init(){
   try{
-    const [sets,kids]=await Promise.all([
-      sbFetch('app_settings?id=eq.global&select=*'),
-      sbFetch('children?select=*&order=created_at.asc')
-    ]);
+    // Load settings — graceful if no 'global' row exists yet
+    const sets=await sbFetchSafe('app_settings?id=eq.global&select=*');
     if(sets&&sets[0])appSettings={...appSettings,...sets[0]};
+    else{
+      // Try to create the global settings row so future updates work
+      await sbFetchSafe('app_settings',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:'global',parent_pin:'1234',dash_lang:'en'})});
+    }
+    // Load children — if this fails we still show the UI
+    const kids=await sbFetchSafe('children?select=*&order=created_at.asc');
     if(kids)allChildren=kids;
     document.getElementById('land-loading').classList.add('hidden');
     const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
   }catch(e){
-    document.getElementById('land-loading').innerHTML='<span style="color:var(--r)">⚠️ Connection issue. Please refresh.</span>';
+    console.error('Init error:',e);
+    // Still show the UI even if backend is slow/unreachable
+    document.getElementById('land-loading').classList.add('hidden');
+    const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
   }
 }
 init();
@@ -477,8 +485,12 @@ function showModal(h){document.getElementById('modal-box').innerHTML=h;document.
 function hideModal(){document.getElementById('modal-overlay').classList.add('hidden');}
 document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)hideModal();});
 
-function renderChildSelect(){
+async function renderChildSelect(){
   const el=document.getElementById('child-list');
+  el.innerHTML='<div style="text-align:center;color:var(--mu);font-weight:700;padding:20px"><span class="spin">⏳</span> Loading...</div>';
+  // Always fetch fresh from DB so newly created profiles appear immediately
+  const fresh=await sbFetchSafe('children?select=*&order=created_at.asc');
+  if(fresh)allChildren=fresh;
   if(!allChildren.length){el.innerHTML='<p style="text-align:center;color:var(--mu);font-weight:700;padding:20px">No profiles yet. Ask a parent to create one!</p>';return;}
   el.innerHTML=allChildren.map(c=>`
     <div class="card hov" onclick="selectChild('${c.id}')" style="display:flex;align-items:center;gap:14px;padding:18px;margin-bottom:12px">
@@ -486,7 +498,7 @@ function renderChildSelect(){
       <div style="flex:1">
         <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--p)">${c.name}</div>
         <div style="font-size:12px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div>
-        <div style="display:flex;align-items:center;gap:4px;margin-top:3px"><span style="font-size:13px">⭐</span><span style="font-weight:800;font-size:13px;color:#D97706">${c.stars}</span></div>
+        <div style="display:flex;align-items:center;gap:4px;margin-top:3px"><span style="font-size:13px">⭐</span><span style="font-weight:800;font-size:13px;color:#D97706">${c.stars||0}</span></div>
       </div>
       <div style="font-size:22px;color:var(--mu)">›</div>
     </div>`).join('');
@@ -510,7 +522,8 @@ function childPinKey(k){
 }
 function updateCPDots(){for(let i=0;i<4;i++){document.getElementById('cpd'+i)?.classList.toggle('filled',i<childPinEntry.length);}}
 function checkCP(){
-  if(childPinEntry===currentChild.pin){document.getElementById('cp-err').classList.add('hidden');enterHome();}
+  // Always compare as strings — PIN stored as text in DB
+  if(String(childPinEntry)===String(currentChild.pin)){document.getElementById('cp-err').classList.add('hidden');enterHome();}
   else{document.getElementById('cp-err').classList.remove('hidden');childPinEntry='';updateCPDots();}
 }
 function enterHome(){
@@ -1177,8 +1190,8 @@ async function endSession(){
     const subj=SUBJECTS.find(s=>s.id===cfg.subject);
     const wrong=sessionQs.filter(q=>!q.userCorrect).map(q=>({text:q.text||'',type:q.type||'',userAnswer:q.userAnswer??'',answer:Array.isArray(q.answer)?q.answer.join(', '):String(q.answer??''),explanation:q.explanation||'',topic:q.topic||''}));
     const topicSummary=(cfg.topics&&cfg.topics.length)?cfg.topics.join(' • '):(cfg.topic||'');
-    await sbFetchSafe('sessions',{method:'POST',body:JSON.stringify({child_id:currentChild.id,date:new Date().toISOString().split('T')[0],subject:subj?.label||cfg.subject,topic:topicSummary,score:correct,total:total,duration:Math.floor(12+Math.random()*8),wrong_questions:JSON.stringify(wrong),mode:cfg.mode,lang:cfg.lang==='fr'?'Français':cfg.lang==='ar'?'عربي':'English'})});
-  }
+    const sessId='sess_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+    await sbFetchSafe('sessions',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:sessId,child_id:currentChild.id,date:new Date().toISOString().split('T')[0],subject:subj?.label||cfg.subject,topic:topicSummary,score:correct,total:total,duration:Math.floor(12+Math.random()*8),wrong_questions:JSON.stringify(wrong),mode:cfg.mode,lang:cfg.lang==='fr'?'Fran\u00e7ais':cfg.lang==='ar'?'\u0639\u0631\u0628\u064a':'English'})});
   document.getElementById('res-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('res-score').textContent=score+'/10';
   document.getElementById('res-title').textContent=score>=9?'Incredible! 🏆':score>=7?'Great Work! 🌟':score>=5?'Good Effort! 💪':'Keep Practicing! 🎯';
@@ -1247,7 +1260,7 @@ async function endSprint(){
     await sbFetchSafe('children?id=eq.'+currentChild.id,{method:'PATCH',body:JSON.stringify({stars:currentChild.stars})});
     allChildren=allChildren.map(c=>c.id===currentChild.id?{...c,stars:currentChild.stars}:c);
     const from=parseInt(document.getElementById('fs-from').value);const to=parseInt(document.getElementById('fs-to').value);
-    await sbFetchSafe('flash_sprints',{method:'POST',body:JSON.stringify({child_id:currentChild.id,date:new Date().toISOString().split('T')[0],operation:fsOp,range_from:from,range_to:to,total_time:parseFloat(t),accuracy:acc,questions_count:fsAnswers.length,correct_count:correct})});
+    const fsId='fs_'+Date.now()+'_'+Math.floor(Math.random()*9999); await sbFetchSafe('flash_sprints',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:fsId,child_id:currentChild.id,date:new Date().toISOString().split('T')[0],operation:fsOp,range_from:from,range_to:to,total_time:parseFloat(t),accuracy:acc,questions_count:fsAnswers.length,correct_count:correct})});
   }
 }
 async function renderSprintHistory(){
@@ -1428,7 +1441,7 @@ function assignTopicToChild(childId,childName,topic,subject,grade){
 }
 async function confirmAssignTopic(childId,childName,topic,subject,grade){
   hideModal();
-  await sbFetchSafe('topic_suggestions',{method:'POST',body:JSON.stringify({child_id:childId,topic,subject,grade,status:'approved',rationale:'Manually assigned by parent',created_at:new Date().toISOString()})});
+  const sugId='sug_'+Date.now()+'_'+Math.floor(Math.random()*9999); await sbFetchSafe('topic_suggestions',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:sugId,child_id:childId,topic,subject,grade,status:'approved',rationale:'Manually assigned by parent',created_at:new Date().toISOString()})});
   toast(`📌 ${topic} added to ${childName}!`);
 }
 async function approveSug(id){await sbFetchSafe('topic_suggestions?id=eq.'+id,{method:'PATCH',body:JSON.stringify({status:'approved'})});toast('✅ Approved!');showDashTab(currentDashTab);}
@@ -1445,6 +1458,9 @@ async function renderDashSprints(el){
 
 async function renderDashProfiles(el){
   const L=appSettings.dashLang==='fr';
+  el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
+  const fresh=await sbFetchSafe('children?select=*&order=created_at.asc');
+  if(fresh)allChildren=fresh;
   el.innerHTML=`<div class="section-title">${L?'Gestion des profils':'Profiles'}</div>${allChildren.map(c=>`<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:14px 16px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><button class="btn btn-danger btn-sm" onclick="confirmDelete('${c.id}','${c.name}')">🗑</button></div>`).join('')}<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="showAddChild()">+ ${L?'Ajouter un enfant':'Add Child'}</button>`;
 }
 function showAddChild(){
@@ -1461,14 +1477,43 @@ function showAddChild(){
 }
 function pickNCMascot(emoji,el){window._ncMascot=emoji;document.querySelectorAll('#nc-mascots>div').forEach(d=>{d.style.borderColor='var(--br)';d.style.background='#fff';});el.style.borderColor='var(--p)';el.style.background='var(--pl)';}
 async function createChild(){
-  const name=document.getElementById('nc-name')?.value.trim();const grade=document.getElementById('nc-grade')?.value;const curr=document.getElementById('nc-curr')?.value;const pin=document.getElementById('nc-pin')?.value;
-  if(!name||!pin||String(pin).length!==4){toast('Fill all fields correctly!');return;}
-  const id='child_'+Date.now();
+  const name=document.getElementById('nc-name')?.value.trim();
+  const grade=document.getElementById('nc-grade')?.value;
+  const curr=document.getElementById('nc-curr')?.value;
+  const pinRaw=document.getElementById('nc-pin')?.value;
+  const pin=String(pinRaw||'').trim();
+  if(!name){toast('Please enter a name!');return;}
+  if(!/^\d{4}$/.test(pin)){toast('PIN must be exactly 4 digits!');return;}
+  const id='child_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  const payload={
+    id,
+    name,
+    pin,                          // stored as text string
+    grade,
+    mascot: window._ncMascot||'🦁',
+    curriculum: curr,
+    stars: 0,
+    lang_pref: 'mixed',
+    parent_id: 'global',          // text field — matches the schema used in setup
+    badges: JSON.stringify([]),
+    created_at: new Date().toISOString()
+  };
   try{
-    await sbFetch('children',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id,name,pin,grade,mascot:window._ncMascot||'🦁',curriculum:curr,stars:0,lang_pref:'mixed',parent_id:currentParent?.id||'global',created_at:new Date().toISOString()})});
-    const kids=await sbFetch('children?select=*&order=created_at.asc');if(kids)allChildren=kids;
-    hideModal();toast(name+' added! 🎉');showDashTab('profiles');
-  }catch(e){toast('Error creating profile.'); console.error(e);}
+    await sbFetch('children',{
+      method:'POST',
+      headers:{'Prefer':'return=minimal'},  // avoids post-insert SELECT permission issues
+      body:JSON.stringify(payload)
+    });
+    // Reload children list fresh from DB
+    const kids=await sbFetchSafe('children?select=*&order=created_at.asc');
+    if(kids)allChildren=kids;
+    hideModal();
+    toast(name+' added! 🎉');
+    showDashTab('profiles');
+  }catch(e){
+    console.error('createChild error:',e);
+    toast('Error creating profile. Check Supabase RLS policies.');
+  }
 }
 function confirmDelete(id,name){
   showModal(`<h3 style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--r);margin-bottom:8px">⚠️ Delete Profile</h3><p style="font-weight:700;font-size:13px;margin-bottom:4px">Permanently delete <strong>${name}'s</strong> profile?</p><p style="font-weight:600;font-size:12px;color:var(--mu);margin-bottom:16px">All data — progress, badges, stars, sessions — will be lost forever.</p><div style="background:var(--rl);border-radius:10px;padding:10px;margin-bottom:14px"><div style="font-weight:800;font-size:12px;color:#991B1B">Type "${name}" to confirm:</div><input type="text" id="del-confirm" placeholder="Type name here…" style="margin-top:6px;border-color:#FCA5A5"></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button><button class="btn btn-danger" style="flex:1" onclick="deleteChild('${id}','${name}')">🗑 Delete</button></div>`);
@@ -1476,8 +1521,12 @@ function confirmDelete(id,name){
 async function deleteChild(id,name){
   const val=document.getElementById('del-confirm')?.value.trim();
   if(val!==name){toast('Name does not match!');return;}
-  try{await sbFetch('children?id=eq.'+id,{method:'DELETE',headers:{'Prefer':'return=minimal'}});const kids=await sbFetch('children?select=*&order=created_at.asc');if(kids)allChildren=kids;hideModal();toast('Profile deleted.');showDashTab('profiles');}
-  catch(e){toast('Error deleting profile.');}
+  try{
+    await sbFetch('children?id=eq.'+id,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+    const kids=await sbFetchSafe('children?select=*&order=created_at.asc');
+    if(kids)allChildren=kids;
+    hideModal();toast('Profile deleted.');showDashTab('profiles');
+  }catch(e){console.error('deleteChild error:',e);toast('Error deleting profile.');}
 }
 
 async function renderDashSettings(el){
