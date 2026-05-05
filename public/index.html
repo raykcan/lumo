@@ -93,7 +93,7 @@ input:focus,select:focus{border-color:var(--p)}
   <div style="font-size:90px;animation:bounce 2s ease-in-out infinite;display:inline-block;margin-bottom:4px">🦉</div>
   <h1 style="font-family:'Fredoka One',cursive;font-size:48px;color:var(--p);line-height:1;margin-bottom:6px">Lumo</h1>
   <p style="font-size:16px;color:var(--mu);margin-bottom:36px;font-weight:700">Your smart learning adventure!</p>
-  <div id="land-loading" style="color:var(--mu);font-weight:700;font-size:14px;margin-bottom:20px"><span class="spin">⏳</span> Loading...</div>
+  <div id="land-loading" style="color:var(--mu);font-weight:700;font-size:14px;margin-bottom:20px"><span class="spin">⏳</span> Connecting to Lumo... <span id="land-loading-sub" style="font-size:11px;display:block;margin-top:4px;opacity:.6">If this takes more than 5 seconds, your Supabase key may need updating</span></div>
   <div id="land-btns" class="hidden" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px">
     <button class="btn btn-primary btn-lg btn-full" onclick="go('s-child-select');renderChildSelect()">👦 I'm a Student!</button>
     <button class="btn btn-secondary btn-full" style="padding:13px 22px" onclick="go('s-parent-login');resetParentPin()">🔒 Parent Dashboard</button>
@@ -399,12 +399,16 @@ const SB_KEY='sb_publishable_jknkJ-FqbDUdKjU3UfECnQ_-kxIGhoU';
 const CLAUDE_MODEL='claude-sonnet-4-20250514';
 
 async function sbFetch(path,opts={}){
-  // Build headers: defaults first, then opts.headers overrides them (fixes Prefer: return=minimal not working)
+  // opts.headers always override defaults (fixes Prefer: return=minimal)
   const defaultHeaders={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'};
   const mergedHeaders={...defaultHeaders,...(opts.headers||{})};
   const {headers:_h,...restOpts}=opts;
   const r=await fetch(SB_URL+'/rest/v1/'+path,{headers:mergedHeaders,...restOpts});
-  if(!r.ok){const e=await r.text();throw new Error(e);}
+  if(!r.ok){
+    const e=await r.text();
+    console.error('Supabase error ['+r.status+'] on '+path+':', e);
+    throw new Error('HTTP '+r.status+': '+e);
+  }
   return r.status===204?null:await r.json();
 }
 
@@ -456,28 +460,24 @@ let fsQs=[];let fsIdx=0;let fsStart=0;let fsTimerInt=null;let fsAnswers=[];
 
 async function sbFetchSafe(path,opts={}){try{return await sbFetch(path,opts);}catch(e){console.error(e);return null;}}
 
+function showLandingButtons(){
+  document.getElementById('land-loading').classList.add('hidden');
+  const b=document.getElementById('land-btns');
+  b.classList.remove('hidden');
+  b.style.display='flex';
+}
 async function init(){
+  // Hard 5-second safety timeout — UI always shows regardless of backend
+  const timeout=setTimeout(showLandingButtons,5000);
   try{
-    // Load settings — graceful if no 'global' row exists yet
     const sets=await sbFetchSafe('app_settings?id=eq.global&select=*');
-    if(sets&&sets[0])appSettings={...appSettings,...sets[0]};
-    else{
-      // Try to create the global settings row so future updates work
-      await sbFetchSafe('app_settings',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:'global',parent_pin:'1234',dash_lang:'en'})});
-    }
-    // Load children — if this fails we still show the UI
+    if(sets&&sets[0]){appSettings={...appSettings,...sets[0]};}
+    else if(sets!==null){await sbFetchSafe('app_settings',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({id:'global',parent_pin:'1234',dash_lang:'en'})});}
     const kids=await sbFetchSafe('children?select=*&order=created_at.asc');
     if(kids)allChildren=kids;
-    document.getElementById('land-loading').classList.add('hidden');
-    const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
-  }catch(e){
-    console.error('Init error:',e);
-    // Still show the UI even if backend is slow/unreachable
-    document.getElementById('land-loading').classList.add('hidden');
-    const b=document.getElementById('land-btns');b.classList.remove('hidden');b.style.display='flex';
-  }
+  }catch(e){console.error('Init error:',e);}
+  finally{clearTimeout(timeout);showLandingButtons();}
 }
-init();
 
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id)?.classList.add('active');}
 function toast(m,d=2600){const t=document.getElementById('toast');t.textContent=m;t.style.transform='translateX(-50%) translateY(0)';setTimeout(()=>t.style.transform='translateX(-50%) translateY(100px)',d);}
