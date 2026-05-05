@@ -409,7 +409,10 @@ async function sbFetch(path,opts={}){
     console.error('Supabase error ['+r.status+'] on '+path+':', e);
     throw new Error('HTTP '+r.status+': '+e);
   }
-  return r.status===204?null:await r.json();
+  if(r.status===204||r.headers.get('content-length')==='0')return null;
+  const text=await r.text();
+  if(!text||!text.trim())return null;
+  try{return JSON.parse(text);}catch(e){return null;}
 }
 
 async function claudeAsk(prompt,sys){
@@ -1595,11 +1598,11 @@ async function renderDashAnalytics(el){
         });
         const typeLabels={'mc':'Multiple Choice','input':'Fill-in-the-blank','tf':'True / False'};
         const fmtLabels2={'text':'Text Questions','real_world':'🌍 Real World','table':'📊 Tables','chart':'📈 Charts','map':'🗺️ Maps','image':'🖼️ Visual'};
-        const renderBar=(label,stats)=>{const acc=stats.total?Math.round(stats.correct/stats.total*100):0;return `<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:11px;font-weight:700">\${label}</span><span style="font-size:11px;font-weight:800;color:\${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}">\${acc}% (\${stats.correct}/\${stats.total})</span></div><div class="progress-wrap"><div class="progress-fill" style="width:\${acc}%;background:\${acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)'}"></div></div></div>`;};
-        const typeHTML=Object.keys(qt).length?Object.entries(qt).map(([t,d])=>renderBar(typeLabels[t]||t,d)).join(''):'<div style="font-size:11px;color:var(--mu)">No data yet.</div>';
-        const fmtHTML=Object.keys(qf).filter(f=>f!=='text'&&qf[f].total>0).length?Object.entries(qf).filter(([f])=>f!=='text').map(([f,d])=>renderBar(fmtLabels2[f]||f,d)).join(''):'';
-        const topicHTML=Object.keys(topicStats).length?`<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">Performance by Topic</div>\${Object.entries(topicStats).sort((a,b)=>b[1].total-a[1].total).slice(0,8).map(([t,d])=>renderBar(t,d)).join('')}`:'';
-        return typeHTML+(fmtHTML?`<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">By Question Format</div>\${fmtHTML}`:'')+topicHTML;
+        const renderBar=function(label,stats){var acc=stats.total?Math.round(stats.correct/stats.total*100):0;var col=acc>=80?'var(--g)':acc>=60?'#D97706':'var(--r)';return '<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;margin-bottom:2px">'+'<span style="font-size:11px;font-weight:700">'+label+'</span>'+'<span style="font-size:11px;font-weight:800;color:'+col+'">'+acc+'% ('+stats.correct+'/'+stats.total+')</span>'+'</div><div class="progress-wrap"><div class="progress-fill" style="width:'+acc+'%;background:'+col+'"></div></div></div>';};
+        const typeHTML=Object.keys(qt).length?Object.entries(qt).map(function(e){return renderBar(typeLabels[e[0]]||e[0],e[1]);}).join(''):'<div style="font-size:11px;color:var(--mu)">No data yet.</div>';
+        const fmtHTML=Object.keys(qf).filter(function(f){return f!=='text'&&qf[f].total>0;}).length?Object.entries(qf).filter(function(e){return e[0]!=='text';}).map(function(e){return renderBar(fmtLabels2[e[0]]||e[0],e[1]);}).join(''):'';
+        const topicHTML=Object.keys(topicStats).length?('<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">Performance by Topic</div>'+Object.entries(topicStats).sort(function(a,b){return b[1].total-a[1].total;}).slice(0,8).map(function(e){return renderBar(e[0],e[1]);}).join('')):'';
+        return typeHTML+(fmtHTML?('<div class="divider"></div><div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">By Question Format</div>'+fmtHTML):'')+topicHTML;
       })()}
       <div class="divider"></div>
       <div style="font-weight:800;font-size:12px;margin-bottom:8px;color:var(--mu)">${L?'Journal':'Session Log'}</div>
