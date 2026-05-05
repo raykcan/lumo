@@ -527,11 +527,17 @@ function checkCP(){
   if(String(childPinEntry)===String(currentChild.pin)){document.getElementById('cp-err').classList.add('hidden');enterHome();}
   else{document.getElementById('cp-err').classList.remove('hidden');childPinEntry='';updateCPDots();}
 }
+async function loadApprovedTopics(){
+  if(!currentChild)return;
+  const rows=await sbFetchSafe('topic_suggestions?child_id=eq.'+currentChild.id+'&status=eq.approved&select=topic,subject,grade');
+  currentChild._approvedTopics=rows||[];
+}
 function enterHome(){
   document.getElementById('h-mascot').textContent=currentChild.mascot;
   document.getElementById('h-name').textContent=currentChild.name;
   document.getElementById('h-grade').textContent=currentChild.grade+' • '+currentChild.curriculum;
   document.getElementById('h-stars').textContent=currentChild.stars;
+  loadApprovedTopics();
   go('s-home');showTab('home');
 }
 function goHome(){
@@ -592,7 +598,7 @@ function renderLearnTab(el){
 function renderBadgesTab(el){
   el.innerHTML=`<div class="section-title">Your Badges 🏅</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-    ${(currentChild.badges||[]).map(b=>`<div class="card" style="text-align:center;padding:14px 6px;${b.earned?'border:2px solid var(--y)':'opacity:.45'}"><div style="font-size:28px">${b.earned?'🏅':'🔒'}</div><div style="font-size:10px;font-weight:700;margin-top:3px;color:${b.earned?'var(--p)':'var(--mu)'}">${b.label}</div>${b.earned?'<div style="font-size:9px;color:var(--g);font-weight:700;margin-top:2px">✓ Earned!</div>':''}</div>`).join('')}
+    ${(typeof currentChild.badges==='string'?JSON.parse(currentChild.badges||'[]'):(currentChild.badges||[])).map(b=>`<div class="card" style="text-align:center;padding:14px 6px;${b.earned?'border:2px solid var(--y)':'opacity:.45'}"><div style="font-size:28px">${b.earned?'🏅':'🔒'}</div><div style="font-size:10px;font-weight:700;margin-top:3px;color:${b.earned?'var(--p)':'var(--mu)'}">${b.label}</div>${b.earned?'<div style="font-size:9px;color:var(--g);font-weight:700;margin-top:2px">✓ Earned!</div>':''}</div>`).join('')}
   </div>`;
 }
 function renderProfileTab(el){
@@ -651,7 +657,10 @@ function selectSubject(id){
   cfg.subject=id;
   SUBJECTS.forEach(s=>{const b=document.getElementById('sb-'+s.id);if(b){b.style.borderColor=s.id===id?'var(--p)':'var(--br)';b.style.background=s.id===id?'var(--pl)':'#fff';}});
   const grade=currentChild?.grade||'Grade 1';
-  const gradeTopics=(TOPICS[id]||{})[grade]||['General'];
+  const basTopics=(TOPICS[id]||{})[grade]||['General'];
+  const assignedTopics=(currentChild._approvedTopics||[])
+    .filter(t=>t.subject===id&&t.grade===grade).map(t=>t.topic);
+  const gradeTopics=[...new Set([...basTopics,...assignedTopics])];
   const box=document.getElementById('topic-checkboxes');
   box.innerHTML=gradeTopics.map(t=>`
     <label class="topic-chk-lbl" style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:10px;border:2px solid var(--br);cursor:pointer;font-size:13px;font-weight:700;background:#fff;transition:all .15s;user-select:none">
@@ -696,6 +705,7 @@ async function startSession(){
   if(!cfg.subject){toast('Please choose a subject! 📚');return;}
   if(!cfg.topics||!cfg.topics.length){toast('Please choose at least one topic! 🎯');return;}
   sessionQs=[];sessIdx=0;sessAnswered=false;sessStars=0;
+  Object.keys(_usedQIndices).forEach(k=>delete _usedQIndices[k]); // reset per-session
   document.getElementById('sess-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('q-tot').textContent=cfg.count;
   document.getElementById('sess-stars').textContent='0';
@@ -725,7 +735,7 @@ async function loadNextQ(){
 }
 
 
-const _usedQIndices = new Set();
+const _usedQIndices = {}; // keyed by 'subject|topic|grade' for proper per-topic tracking
 
 
 const QB = {
@@ -1015,16 +1025,20 @@ function getQuestions(subject, topic, grade) {
 
 function getQFromBank(subject, topic, grade, idx, usedIndices) {
   const pool = getQuestions(subject, topic, grade);
-  if (!pool) return null;
-  // Find an unused question
-  const available = pool.map((q,i) => i).filter(i => !usedIndices.has(i));
+  if (!pool || pool.length === 0) return null;
+  const key = subject+'|'+topic+'|'+grade;
+  if (!usedIndices[key]) usedIndices[key] = new Set();
+  const used = usedIndices[key];
+  const available = pool.map((_,i) => i).filter(i => !used.has(i));
   if (available.length === 0) {
-    // All used — reset and reuse
-    usedIndices.clear();
-    return pool[idx % pool.length];
+    // All questions used for this topic — reset just this topic's set
+    used.clear();
+    const pick = Math.floor(Math.random() * pool.length);
+    used.add(pick);
+    return pool[pick];
   }
   const pick = available[Math.floor(Math.random() * available.length)];
-  usedIndices.add(pick);
+  used.add(pick);
   return pool[pick];
 }
 
@@ -1081,16 +1095,21 @@ JSON format: {"text":"...","type":"${qType}",${qType === 'mc' ? '"opts":["A","B"
     const parsed = JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g, '').trim());
     return { ...parsed, topic, lang, examMode: cfg.mode === 'exam', userCorrect: null };
   } catch(e) {
-    // Ultimate fallback - return a simple question
-    return {
-      type: 'mc',
-      text: `What is an important concept in ${topic}?`,
-      opts: ['Review your notes', 'Ask your teacher', topic, 'Study more'],
-      answer: topic,
-      hint: `Think about what you have learned in ${topic}.`,
-      explanation: `Keep studying ${topic} — you're doing great!`,
-      topic, lang, examMode: cfg.mode === 'exam', userCorrect: null
-    };
+    // If AI fails, try one more time with a simpler prompt
+    try {
+      const simple = `Generate ONE simple ${lang==='fr'?'French':'English'} Grade ${parseInt(grade.replace('Grade ',''))||1} ${qType==='mc'?'multiple choice (4 options A/B/C/D)':qType==='tf'?'True/False':'short answer'} question about ${topic} for ${subj?.label}. Return ONLY JSON: {"text":"...","type":"${qType}"${qType==='mc'?',"opts":["A","B","C","D"]':''},"answer":"...","hint":"...","explanation":"..."}`;
+      const raw2 = await claudeAsk(simple, 'Return only valid JSON, no markdown.');
+      const p2 = JSON.parse(raw2.replace(/```json|```/g,'').trim());
+      return {...p2, topic, lang, examMode: cfg.mode==='exam', userCorrect: null};
+    } catch(e2) {
+      // True last resort: pull any question from the bank for this subject/grade regardless of topic
+      const subjectBank = QB[subject] || QB[cfg.subject] || {};
+      for (const t of Object.keys(subjectBank[grade]||{})) {
+        const fallback = getQFromBank(cfg.subject, t, grade, 0, _usedQIndices);
+        if (fallback) return {...fallback, topic, lang, examMode: cfg.mode==='exam', userCorrect: null};
+      }
+      return null; // caller will show retry button
+    }
   }
 }
 
@@ -1300,12 +1319,12 @@ function showDashTab(tab){
 async function renderDashOverview(el){
   const L=appSettings.dashLang==='fr';el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
-    const [sugs,childData]=await Promise.all([sbFetch('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc'),Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}))]);
+    const [sugs,childData]=await Promise.all([sbFetchSafe('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc'),Promise.all(allChildren.map(async c=>{const sessions=await sbFetchSafe('sessions?child_id=eq.'+c.id+'&order=created_at.desc&limit=20')||[];return{c,sessions};}))]);
     const pending=(sugs||[]).filter(s=>s.status==='pending');
     el.innerHTML=`
       ${pending.length?`<div style="background:var(--yl);border:1px solid #FCD34D;border-radius:14px;padding:14px;margin-bottom:14px"><div style="font-weight:800;font-size:13px;color:#92400E;margin-bottom:8px">🔔 ${pending.length} ${L?'suggestion(s)':'pending suggestion(s)'}</div>${pending.map(s=>`<div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:7px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">${s.children?.name||''}: ${s.text}</div><div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" onclick="approveS('${s.id}')">✓ ${L?'Approuver':'Approve'}</button><button class="btn btn-sm btn-danger" onclick="rejectS('${s.id}')">✗ ${L?'Rejeter':'Reject'}</button></div></div>`).join('')}</div>`:''}
       <div class="section-title">${L?'Résumé':'Overview'}</div>
-      ${childData.map(({c,sessions})=>{const avg=sessions.length?Math.round(sessions.reduce((a,s)=>a+s.score,0)/sessions.length*10)/10:0;const last=sessions[0];return`<div class="card hov" style="margin-bottom:12px" onclick="showDashTab('analytics')"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><span style="font-weight:800;color:#D97706;font-size:15px">⭐${c.stars}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Sessions</div><div style="font-weight:800;color:var(--p)">${sessions.length}</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Moy.':'Avg'}</div><div style="font-weight:800;color:var(--g)">${avg}/10</div></div><div style="text-align:center;background:var(--yl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Badges</div><div style="font-weight:800;color:#D97706">${(c.badges||[]).filter(b=>b.earned).length}</div></div></div>${last?`<div style="margin-top:8px;font-size:11px;color:var(--mu);font-weight:600">Last: ${last.date} — ${last.subject} ${last.score}/10</div>`:''}</div>`;}).join('')}`;
+      ${childData.map(({c,sessions})=>{const avg=sessions.length?Math.round(sessions.reduce((a,s)=>a+s.score,0)/sessions.length*10)/10:0;const last=sessions[0];return`<div class="card hov" style="margin-bottom:12px" onclick="showDashTab('analytics')"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:32px">${c.mascot}</span><div style="flex:1"><div style="font-family:'Fredoka One',cursive;font-size:17px;color:var(--p)">${c.name}</div><div style="font-size:11px;font-weight:700;color:var(--mu)">${c.grade} • ${c.curriculum}</div></div><span style="font-weight:800;color:#D97706;font-size:15px">⭐${c.stars}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center;background:var(--pl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Sessions</div><div style="font-weight:800;color:var(--p)">${sessions.length}</div></div><div style="text-align:center;background:var(--gl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">${L?'Moy.':'Avg'}</div><div style="font-weight:800;color:var(--g)">${avg}/10</div></div><div style="text-align:center;background:var(--yl);border-radius:9px;padding:7px"><div style="font-size:10px;font-weight:700;color:var(--mu)">Badges</div><div style="font-weight:800;color:#D97706">${(typeof c.badges==='string'?JSON.parse(c.badges||'[]'):(c.badges||[])).filter(b=>b.earned).length}</div></div></div>${last?`<div style="margin-top:8px;font-size:11px;color:var(--mu);font-weight:600">Last: ${last.date} — ${last.subject} ${last.score}/10</div>`:''}</div>`;}).join('')}`;
   }catch(e){el.innerHTML='<div class="alert alert-err">Could not load data.</div>';}
 }
 
@@ -1382,7 +1401,7 @@ async function renderDashTopics(el){
   const L=appSettings.dashLang==='fr';
   el.innerHTML=`<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading…</div>`;
   try{
-    const sugs=await sbFetch('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc')||[];
+    const sugs=await sbFetchSafe('topic_suggestions?select=*,children(name,mascot)&order=created_at.asc')||[];
     el.innerHTML=`<div class="section-title">${L?'Gestion des sujets':'Topic Management'}</div>
     <div class="card" style="margin-bottom:14px"><div style="font-weight:800;font-size:14px;margin-bottom:10px">🔔 ${L?'Suggestions en attente':'Pending Suggestions'}</div>
     ${!sugs.length?`<div style="color:var(--mu);font-weight:700;font-size:13px">${L?'Aucune suggestion.':'No suggestions yet.'}</div>`:sugs.map(s=>`<div style="background:${s.status==='approved'?'var(--gl)':s.status==='rejected'?'var(--rl)':'var(--yl)'};border-radius:11px;padding:12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span>${s.children?.mascot||'🦁'}</span><span style="font-weight:800;font-size:12px">${s.children?.name||''}</span><span class="badge ${s.status==='approved'?'badge-g':s.status==='rejected'?'badge-r':'badge-y'}">${s.status}</span></div><div style="font-size:13px;font-weight:700;margin-bottom:5px">${s.topic}</div><div style="font-size:11px;color:var(--mu);font-weight:600;margin-bottom:8px">${s.rationale||''}</div>${s.status==='pending'?`<div style="display:flex;gap:7px"><button class="btn btn-success btn-sm" style="flex:1" onclick="approveSug('${s.id}')">✓ ${L?'Approuver':'Approve'}</button><button class="btn btn-danger btn-sm" style="flex:1" onclick="rejectSug('${s.id}')">✗ ${L?'Rejeter':'Reject'}</button></div>`:''}</div>`).join('')}
@@ -1507,18 +1526,27 @@ async function createChild(){
   try{
     await sbFetch('children',{
       method:'POST',
-      headers:{'Prefer':'return=minimal'},  // avoids post-insert SELECT permission issues
+      headers:{'Prefer':'return=minimal'},
       body:JSON.stringify(payload)
     });
-    // Reload children list fresh from DB
+    // Small delay to let Supabase propagate the insert before re-fetching
+    await new Promise(r=>setTimeout(r,400));
     const kids=await sbFetchSafe('children?select=*&order=created_at.asc');
-    if(kids)allChildren=kids;
+    if(kids&&kids.length)allChildren=kids;
+    else allChildren=[...allChildren,{...payload,stars:0,badges:'[]'}]; // optimistic fallback
     hideModal();
     toast(name+' added! 🎉');
     showDashTab('profiles');
   }catch(e){
     console.error('createChild error:',e);
-    toast('Error creating profile. Check Supabase RLS policies.');
+    // Check if it actually succeeded despite the error (e.g. refetch worked)
+    const check=await sbFetchSafe('children?select=*&order=created_at.asc');
+    if(check&&check.find(c=>c.name===name)){
+      if(check.length)allChildren=check;
+      hideModal();toast(name+' added! 🎉');showDashTab('profiles');
+    } else {
+      toast('Error creating profile. Check Supabase RLS policies.');
+    }
   }
 }
 function confirmDelete(id,name){
