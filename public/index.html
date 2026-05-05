@@ -442,6 +442,7 @@ const MASCOTS=[{e:'🦁',n:'Leo'},{e:'🐼',n:'Panda'},{e:'🐸',n:'Froggy'},{e:
 let appSettings={parent_pin:'1234',dashLang:'en'};
 let allChildren=[];
 let currentChild=null;
+let currentParent=null;
 let childPinEntry='';
 let ppEntry='';
 let currentDashTab='overview';
@@ -527,6 +528,10 @@ function goHome(){
   renderHomeTab(document.getElementById('tab-content'));
 }
 function logoutChild(){currentChild=null;go('s-child-select');renderChildSelect();}
+
+function q(v){return encodeURIComponent(v??'');}
+function sid(){return currentParent?.id||currentChild?.id||'';}
+async function getCurrentUser(){return currentParent;}
 
 function showTab(tab){
   ['home','learn','sprint','badges','profile'].forEach(t=>document.getElementById('tab-'+t)?.classList.toggle('active',t===tab));
