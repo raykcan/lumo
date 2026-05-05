@@ -229,6 +229,7 @@ input:focus,select:focus{border-color:var(--p)}
         <span id="q-exam-badge" class="badge badge-r hidden">📝 Exam</span>
         <span id="q-type-badge" class="badge badge-y"></span>
       </div>
+      <div id="q-visual" style="margin-bottom:14px;display:none;text-align:center"></div>
       <div id="q-text" style="font-size:17px;font-weight:700;line-height:1.55;margin-bottom:18px"></div>
       <div id="q-mc"></div>
       <div id="q-inp" class="hidden">
@@ -384,6 +385,7 @@ input:focus,select:focus{border-color:var(--p)}
   <button class="btn btn-sm btn-secondary" id="dt-sprints" onclick="showDashTab('sprints')" style="white-space:nowrap">⚡ FlashSprint</button>
   <button class="btn btn-sm btn-secondary" id="dt-profiles" onclick="showDashTab('profiles')" style="white-space:nowrap">👤 Profiles</button>
   <button class="btn btn-sm btn-secondary" id="dt-settings" onclick="showDashTab('settings')" style="white-space:nowrap">⚙️ Settings</button>
+  <button class="btn btn-sm btn-secondary" id="dt-bank" onclick="showDashTab('bank')" style="white-space:nowrap">📝 Q Bank</button>
 </div>
 <div id="dash-content" class="content" style="padding-bottom:36px"></div>
 </div>
@@ -751,7 +753,9 @@ async function startSession(){
   if(!cfg.topics||!cfg.topics.length){toast('Please choose at least one topic! 🎯');return;}
   sessionQs=[];sessIdx=0;sessAnswered=false;sessStars=0;
   Object.keys(_usedQIndices).forEach(k=>delete _usedQIndices[k]); // reset per-session
+  _usedQTexts.clear(); // clear all used question texts for new session
   window._topicQueue=null; // reset topic queue
+  resetDBCache(); // reset DB question cache
   document.getElementById('sess-mascot').textContent=currentChild?.mascot||'🦁';
   document.getElementById('q-tot').textContent=cfg.count;
   document.getElementById('sess-stars').textContent='0';
@@ -782,6 +786,7 @@ async function loadNextQ(){
 
 
 const _usedQIndices = {}; // keyed by 'subject|topic|grade' for proper per-topic tracking
+const _usedQTexts = new Set(); // tracks ALL question texts used in current session — prevents any repeat
 const _topicMastery = {}; // keyed by 'subject|topic' → {correct:N, total:N, level:1-5}
 
 // ── AI Question Cache: grows the bank with AI-generated questions ──
@@ -1223,7 +1228,67 @@ function getQFromBank(subject, topic, grade, idx, usedIndices) {
 }
 
 
+// ── Supabase question bank cache ──
+const _dbQCache = {}; // key: subject|topic|grade → {pool:[], used:Set}
+async function getQFromDB(subject, topic, grade){
+  const key = subject+'|'+topic+'|'+grade;
+  if(!_dbQCache[key]){
+    // Fetch from Supabase (cache result so we only fetch once per session)
+    const rows = await sbFetchSafe('question_bank?subject=eq.'+encodeURIComponent(subject)
+      +'&grade=eq.'+encodeURIComponent(grade)
+      +'&topic=eq.'+encodeURIComponent(topic)
+      +'&select=*&order=created_at.asc');
+    _dbQCache[key] = {pool: rows||[], used: new Set()};
+  }
+  const cache = _dbQCache[key];
+  if(!cache.pool.length) return null;
+  const available = cache.pool.map((_,i)=>i).filter(i=>!cache.used.has(i));
+  if(!available.length){ cache.used.clear(); }
+  const pick = available.length ? available[Math.floor(Math.random()*available.length)] : Math.floor(Math.random()*cache.pool.length);
+  cache.used.add(pick);
+  const row = cache.pool[pick];
+  return {
+    type: row.type||'mc',
+    qformat: row.qformat||'text',
+    text: row.text,
+    opts: typeof row.opts==='string' ? JSON.parse(row.opts||'[]') : (row.opts||[]),
+    answer: row.answer,
+    hint: row.hint||'',
+    explanation: row.explanation||'',
+    flag_url: row.flag_url||null,
+    visual_html: row.visual_html||null
+  };
+}
+// Reset DB cache on session start (added alongside _usedQIndices reset)
+function resetDBCache(){ Object.keys(_dbQCache).forEach(k=>{ if(_dbQCache[k]) _dbQCache[k].used=new Set(); }); }
+
 async function genQ(idx) {
+  // Try up to 8 times to get a non-repeated question
+  for(let attempt=0; attempt<8; attempt++){
+    const q = await _genQInner(idx, attempt);
+    if(!q) return null;
+    if(!_usedQTexts.has(q.text)){
+      _usedQTexts.add(q.text);
+      return q;
+    }
+    // Question already seen this session — if we have enough unique questions, go to AI
+    if(attempt>=3){
+      try{
+        const lang=getLang(idx);
+        const subj=SUBJECTS.find(s=>s.id===cfg.subject);
+        const grade=currentChild?.grade||'Grade 1';
+        const topic=window._topicQueue?.queue[idx%window._topicQueue.queue.length]||cfg.topics[0];
+        const fresh=await genQFromAI(idx, lang, subj, grade, topic);
+        if(fresh&&!_usedQTexts.has(fresh.text)){_usedQTexts.add(fresh.text);return fresh;}
+      }catch(e){}
+    }
+  }
+  // All attempts exhausted — return whatever we have even if repeated
+  const fallback=await _genQInner(idx,0);
+  if(fallback)_usedQTexts.add(fallback.text);
+  return fallback;
+}
+async function _genQInner(idx, attempt) {
   const lang = getLang(idx);
   const subj = SUBJECTS.find(s => s.id === cfg.subject);
   const grade = currentChild?.grade || 'Grade 1';
@@ -1238,7 +1303,11 @@ async function genQ(idx) {
   }
   const topic = window._topicQueue.queue[idx % window._topicQueue.queue.length];
   
-  // Try question bank first — bank questions are always English
+  // Try Supabase question bank first (user-added questions)
+  const dbQ = await getQFromDB(cfg.subject, topic, grade);
+  if(dbQ) return {...dbQ, topic, lang:'en', examMode:cfg.mode==='exam', userCorrect:null};
+
+  // Try hardcoded bank — always English
   const bankQ = getQFromBank(cfg.subject, topic, grade, idx, _usedQIndices);
   if (bankQ) {
     return {
@@ -1268,7 +1337,7 @@ async function genQ(idx) {
     }
     return null;
   }
-}
+} // end _genQInner
 
 async function genQFromAI(idx, lang, subj, grade, topic) {
   const gNum = parseInt(grade.replace('Grade ', '')) || 1;
@@ -1319,6 +1388,15 @@ Keep question text age-appropriate and clear for Grade ${gNum}.`;
     const raw = await claudeAsk(prompt, sys);
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
     cacheAIQuestion(cfg.subject, topic, grade, parsed);
+    // Also save to Supabase so it's available across devices
+    const qbId='qb_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+    sbFetchSafe('question_bank',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({
+      id:qbId, subject:cfg.subject, grade:currentChild?.grade||'Grade 1', topic,
+      type:parsed.type||'mc', qformat:parsed.qformat||'text',
+      text:parsed.text, opts:JSON.stringify(parsed.opts||[]),
+      answer:String(parsed.answer), hint:parsed.hint||'', explanation:parsed.explanation||'',
+      difficulty:getMasteryLevel(cfg.subject,topic).level||1, source:'ai'
+    })});
     return { ...parsed, topic, lang, examMode: cfg.mode === 'exam', userCorrect: null };
   } catch(e) {
     // If AI fails, try one more time with a simpler prompt
@@ -1355,6 +1433,17 @@ function renderQ(q){
   const fmtLabels={real_world:'🌍 Real World',table:'📊 Table',chart:'📈 Chart',map:'🗺️ Map',image:'🖼️ Visual',text:''};
   const fmtLabel=fmtLabels[q.qformat]||'';
   document.getElementById('q-type-badge').textContent=({mc:'Multiple Choice',input:'Short Answer',tf:'True / False'}[q.type]||q.type)+(fmtLabel?' · '+fmtLabel:'');
+  // Render visual (flag image, chart, diagram)
+  const qVisual = document.getElementById('q-visual');
+  qVisual.innerHTML = '';
+  qVisual.style.display = 'none';
+  if(q.flag_url){
+    qVisual.innerHTML = '<img src="'+q.flag_url+'" alt="Flag" style="max-width:180px;border-radius:8px;border:2px solid var(--br);box-shadow:0 2px 8px rgba(0,0,0,.12)">';
+    qVisual.style.display = 'block';
+  } else if(q.visual_html){
+    qVisual.innerHTML = q.visual_html;
+    qVisual.style.display = 'block';
+  }
   document.getElementById('q-text').textContent=q.text;
   document.getElementById('q-text').style.direction=q.lang==='ar'?'rtl':'ltr';
   document.getElementById('q-mc').innerHTML='';
@@ -1541,9 +1630,9 @@ function checkPP(){
 function toggleDashLang(){appSettings.dashLang=appSettings.dashLang==='en'?'fr':'en';document.getElementById('dl-btn').textContent=appSettings.dashLang==='en'?'FR':'EN';sbFetchSafe('app_settings?id=eq.global',{method:'PATCH',body:JSON.stringify({dash_lang:appSettings.dashLang})});showDashTab(currentDashTab);}
 function showDashTab(tab){
   currentDashTab=tab;
-  ['overview','analytics','topics','sprints','profiles','settings'].forEach(t=>{const b=document.getElementById('dt-'+t);if(b){b.className='btn btn-sm '+(t===tab?'btn-primary':'btn-secondary');b.style.whiteSpace='nowrap';}});
+  ['overview','analytics','topics','sprints','profiles','settings','bank'].forEach(t=>{const b=document.getElementById('dt-'+t);if(b){b.className='btn btn-sm '+(t===tab?'btn-primary':'btn-secondary');b.style.whiteSpace='nowrap';}});
   const el=document.getElementById('dash-content');
-  if(tab==='overview')renderDashOverview(el);else if(tab==='analytics')renderDashAnalytics(el);else if(tab==='topics')renderDashTopics(el);else if(tab==='sprints')renderDashSprints(el);else if(tab==='profiles')renderDashProfiles(el);else if(tab==='settings')renderDashSettings(el);
+  if(tab==='overview')renderDashOverview(el);else if(tab==='analytics')renderDashAnalytics(el);else if(tab==='topics')renderDashTopics(el);else if(tab==='sprints')renderDashSprints(el);else if(tab==='profiles')renderDashProfiles(el);else if(tab==='settings')renderDashSettings(el);else if(tab==='bank')renderDashBank(el);
 }
 
 async function renderDashOverview(el){
@@ -1854,6 +1943,247 @@ async function changePin(){
 }
 async function setDL(lang){appSettings.dashLang=lang;document.getElementById('dl-btn').textContent=lang==='en'?'FR':'EN';await sbFetchSafe('app_settings?id=eq.global',{method:'PATCH',body:JSON.stringify({dash_lang:lang})});showDashTab('settings');}
 async function setChildLang(id,lang){await sbFetchSafe('children?id=eq.'+id,{method:'PATCH',body:JSON.stringify({lang_pref:lang})});allChildren=allChildren.map(c=>c.id===id?{...c,lang_pref:lang}:c);toast('Language updated!');}
+
+async function renderDashBank(el){
+  const L=appSettings.dashLang==='fr';
+  el.innerHTML='<div class="shimmer" style="color:var(--mu);text-align:center;padding:20px;font-weight:700">Loading question bank…</div>';
+
+  // Fetch all questions from Supabase
+  const rows=await sbFetchSafe('question_bank?select=*&order=subject.asc,grade.asc,topic.asc,created_at.asc')||[];
+
+  // Count hardcoded bank questions per subject
+  const hardcodedCount={};
+  Object.keys(QB).forEach(subj=>{
+    let n=0;
+    Object.values(QB[subj]||{}).forEach(grade=>Object.values(grade||{}).forEach(arr=>{n+=arr.length;}));
+    hardcodedCount[subj]=n;
+  });
+  const totalHard=Object.values(hardcodedCount).reduce((a,b)=>a+b,0);
+
+  // Group DB questions by subject
+  const bySubj={};
+  rows.forEach(r=>{
+    if(!bySubj[r.subject])bySubj[r.subject]=[];
+    bySubj[r.subject].push(r);
+  });
+
+  const sourceLabel=s=>s==='ai'?'<span class="badge badge-b" style="font-size:9px">AI</span>':'<span class="badge badge-g" style="font-size:9px">Manual</span>';
+  const typeLabel=t=>({mc:'MC',input:'Fill-in',tf:'T/F'}[t]||t);
+
+  el.innerHTML=`
+    <div class="section-title">📝 Question Bank</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+      <div class="card card-sm" style="text-align:center;background:var(--pl)">
+        <div style="font-size:10px;font-weight:700;color:var(--mu)">Built-in</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--p)">${totalHard}</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;background:var(--gl)">
+        <div style="font-size:10px;font-weight:700;color:var(--mu)">Added / AI</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--g)">${rows.length}</div>
+      </div>
+      <div class="card card-sm" style="text-align:center;background:var(--yl)">
+        <div style="font-size:10px;font-weight:700;color:var(--mu)">Total</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:22px;color:#D97706">${totalHard+rows.length}</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full" style="margin-bottom:16px" onclick="showAddQuestionModal()">+ Add Question</button>
+
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-weight:800;font-size:13px;margin-bottom:10px">🔍 Filter</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="qb-filter-subj" onchange="filterBankView()" style="font-size:12px;padding:6px 10px;border:2px solid var(--br);border-radius:9px;flex:1;min-width:100px">
+          <option value="">All Subjects</option>
+          ${SUBJECTS.map(s=>'<option value="'+s.id+'">'+s.label+'</option>').join('')}
+        </select>
+        <select id="qb-filter-grade" onchange="filterBankView()" style="font-size:12px;padding:6px 10px;border:2px solid var(--br);border-radius:9px;flex:1;min-width:100px">
+          <option value="">All Grades</option>
+          ${['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6'].map(g=>'<option>'+g+'</option>').join('')}
+        </select>
+        <select id="qb-filter-src" onchange="filterBankView()" style="font-size:12px;padding:6px 10px;border:2px solid var(--br);border-radius:9px;flex:1;min-width:100px">
+          <option value="">All Sources</option>
+          <option value="manual">Manual</option>
+          <option value="ai">AI Generated</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="qb-list">
+      ${rows.length===0
+        ?'<div class="card" style="text-align:center;color:var(--mu);font-weight:700;padding:24px">No questions added yet.<br><span style="font-size:12px">AI-generated questions will appear here automatically.<br>Click "+ Add Question" to add your own.</span></div>'
+        :rows.map(r=>`
+        <div class="card card-sm qb-row" data-subj="${r.subject}" data-grade="${r.grade}" data-src="${r.source||'manual'}" style="margin-bottom:8px">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <div style="flex:1">
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px">
+                <span class="badge badge-p" style="font-size:9px">${r.subject}</span>
+                <span class="badge badge-y" style="font-size:9px">${r.grade}</span>
+                <span class="badge badge-b" style="font-size:9px">${typeLabel(r.type)}</span>
+                ${sourceLabel(r.source)}
+                ${r.difficulty?'<span class="badge" style="background:#F3F4F6;font-size:9px">Lvl '+r.difficulty+'</span>':''}
+              </div>
+              <div style="font-size:11px;font-weight:700;color:var(--mu);margin-bottom:2px">${r.topic}</div>
+              <div style="font-size:12px;font-weight:700;color:var(--tx)">${(r.text||'').replace(/\\n/g,' ').slice(0,100)}${(r.text||'').length>100?'…':''}</div>
+              <div style="font-size:11px;color:var(--g);font-weight:600;margin-top:2px">✓ ${r.answer}</div>
+            </div>
+            <button class="btn btn-danger btn-sm" style="padding:5px 9px;font-size:11px;flex-shrink:0" onclick="deleteQBQuestion('${r.id}')">🗑</button>
+          </div>
+        </div>`).join('')
+      }
+    </div>`;
+}
+
+function filterBankView(){
+  const subj=document.getElementById('qb-filter-subj')?.value||'';
+  const grade=document.getElementById('qb-filter-grade')?.value||'';
+  const src=document.getElementById('qb-filter-src')?.value||'';
+  document.querySelectorAll('.qb-row').forEach(row=>{
+    const ms=!subj||row.dataset.subj===subj;
+    const mg=!grade||row.dataset.grade===grade;
+    const msrc=!src||row.dataset.src===src;
+    row.style.display=(ms&&mg&&msrc)?'':'none';
+  });
+}
+
+async function deleteQBQuestion(id){
+  if(!confirm('Delete this question permanently?'))return;
+  await sbFetchSafe('question_bank?id=eq.'+id,{method:'DELETE',headers:{'Prefer':'return=minimal'}});
+  toast('Question deleted.');
+  showDashTab('bank');
+}
+
+function showAddQuestionModal(){
+  showModal(`
+    <h3 style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--p);margin-bottom:14px">➕ Add Question</h3>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Subject</label>
+          <select id="aq-subj" onchange="updateAQTopics()" style="font-size:12px">
+            ${SUBJECTS.map(s=>'<option value="'+s.id+'">'+s.label+'</option>').join('')}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Grade</label>
+          <select id="aq-grade" onchange="updateAQTopics()" style="font-size:12px">
+            ${['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6'].map(g=>'<option>'+g+'</option>').join('')}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Topic</label>
+        <select id="aq-topic" style="font-size:12px"></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Type</label>
+          <select id="aq-type" onchange="toggleAQOpts()" style="font-size:12px">
+            <option value="mc">Multiple Choice</option>
+            <option value="input">Short Answer</option>
+            <option value="tf">True / False</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Difficulty (1–5)</label>
+          <select id="aq-diff" style="font-size:12px">
+            <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Question Text</label>
+        <textarea id="aq-text" rows="3" style="font-size:13px;width:100%;padding:8px;border:2px solid var(--br);border-radius:10px;font-family:Nunito,sans-serif;resize:vertical" placeholder="Type your question here…"></textarea>
+      </div>
+      <div id="aq-opts-wrap">
+        <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Options (A, B, C, D)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <input id="aq-a" type="text" placeholder="A" style="font-size:12px">
+          <input id="aq-b" type="text" placeholder="B" style="font-size:12px">
+          <input id="aq-c" type="text" placeholder="C" style="font-size:12px">
+          <input id="aq-d" type="text" placeholder="D" style="font-size:12px">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Correct Answer</label>
+        <input id="aq-answer" type="text" placeholder="For MC: type the exact option text. For T/F: true or false." style="font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Hint (optional)</label>
+        <input id="aq-hint" type="text" placeholder="A helpful nudge…" style="font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Explanation (optional)</label>
+        <input id="aq-expl" type="text" placeholder="Explain why the answer is correct…" style="font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:10px;font-weight:700;color:var(--mu);display:block;margin-bottom:3px">Flag image URL (optional — for flag questions)</label>
+        <input id="aq-flag" type="text" placeholder="e.g. https://flagcdn.com/w160/ca.png" style="font-size:12px">
+        <div style="font-size:10px;color:var(--mu);margin-top:3px">Use flagcdn.com/w160/[2-letter-code].png — ca=Canada, fr=France, lb=Lebanon, us=USA, gb=UK, jp=Japan...</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-secondary" style="flex:1" onclick="hideModal()">Cancel</button>
+      <button class="btn btn-success" style="flex:1" onclick="saveNewQuestion()">✓ Save Question</button>
+    </div>`);
+  updateAQTopics();
+  toggleAQOpts();
+}
+
+function updateAQTopics(){
+  const subj=document.getElementById('aq-subj')?.value;
+  const grade=document.getElementById('aq-grade')?.value;
+  const topicSel=document.getElementById('aq-topic');
+  if(!topicSel)return;
+  const topics=(TOPICS[subj]||{})[grade]||['General'];
+  topicSel.innerHTML=topics.map(t=>'<option>'+t+'</option>').join('');
+}
+
+function toggleAQOpts(){
+  const type=document.getElementById('aq-type')?.value;
+  const wrap=document.getElementById('aq-opts-wrap');
+  if(wrap)wrap.style.display=type==='mc'?'block':'none';
+}
+
+async function saveNewQuestion(){
+  const subj=document.getElementById('aq-subj')?.value;
+  const grade=document.getElementById('aq-grade')?.value;
+  const topic=document.getElementById('aq-topic')?.value;
+  const type=document.getElementById('aq-type')?.value;
+  const diff=document.getElementById('aq-diff')?.value;
+  const text=(document.getElementById('aq-text')?.value||'').trim();
+  const answer=(document.getElementById('aq-answer')?.value||'').trim();
+  const hint=(document.getElementById('aq-hint')?.value||'').trim();
+  const expl=(document.getElementById('aq-expl')?.value||'').trim();
+  if(!text||!answer){toast('Question text and answer are required!');return;}
+  let opts=[];
+  if(type==='mc'){
+    opts=[
+      document.getElementById('aq-a')?.value.trim(),
+      document.getElementById('aq-b')?.value.trim(),
+      document.getElementById('aq-c')?.value.trim(),
+      document.getElementById('aq-d')?.value.trim(),
+    ].filter(Boolean);
+    if(opts.length<2){toast('Add at least 2 options for multiple choice!');return;}
+  }
+  const flagUrl=(document.getElementById('aq-flag')?.value||'').trim();
+  const id='qb_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  await sbFetchSafe('question_bank',{
+    method:'POST',
+    headers:{'Prefer':'return=minimal'},
+    body:JSON.stringify({id,subject:subj,grade,topic,type,qformat:flagUrl?'image':'text',
+      text,opts:JSON.stringify(opts),answer,hint,explanation:expl,
+      difficulty:parseInt(diff)||1,source:'manual',
+      flag_url:flagUrl||null})
+  });
+  // Bust the DB cache for this key so it's picked up immediately
+  const key=subj+'|'+topic+'|'+grade;
+  if(_dbQCache[key])delete _dbQCache[key];
+  hideModal();
+  toast('Question saved! ✅');
+  showDashTab('bank');
+}
+
 </script>
 </body>
 </html>
