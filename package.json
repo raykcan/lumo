@@ -1,8 +1,7 @@
 {
-  "name": "lumo-rebuild",
-  "private": true,
+  "name": "lumo-app",
   "version": "1.0.0",
-  "scripts": {
-    "build": "echo 'static site'"
+  "engines": {
+    "node": "24.x"
   }
 }
