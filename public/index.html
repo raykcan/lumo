@@ -7,6 +7,8 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦉</text></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23EDE9FE'/><text x='50' y='75' font-size='70' text-anchor='middle'>🦉</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -289,9 +291,71 @@ input:focus,select:focus{border-color:var(--p)}
 
 <!-- FLASH SPRINT -->
 <div id="s-sprint" class="screen">
-<div class="topbar"><button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button><span class="topbar-title">⚡ FlashSprint</span><div style="width:60px"></div></div>
+<div class="topbar"><button class="btn btn-ghost btn-sm" onclick="goHome()">← Back</button><span class="topbar-title">⚡ Sprint Hub</span><div style="width:60px"></div></div>
 <div class="content">
-  <div id="fs-setup" style="max-width:400px;margin:0 auto">
+  <!-- SPRINT HUB SELECTOR -->
+  <div id="sprint-hub" style="max-width:400px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:20px">
+      <span style="font-size:48px;display:inline-block;animation:bounce 2s ease-in-out infinite">⚡</span>
+      <h2 style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--p);margin-top:6px">Choose Your Sprint!</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <button onclick="showMathSprint()" style="background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--sh);border:2px solid transparent;cursor:pointer;text-align:left;transition:all 0.2s;font-family:'Nunito',sans-serif" onmouseover="this.style.borderColor='var(--p)'" onmouseout="this.style.borderColor='transparent'">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:40px">⚡</div>
+          <div>
+            <div style="font-size:16px;font-weight:900;color:var(--tx)">Mental Math Sprint</div>
+            <div style="font-size:12px;color:var(--mu);font-weight:600;margin-top:2px">Addition, subtraction, multiplication, division</div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <span style="background:var(--yl);color:#92400E;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">⏱️ Timed drill</span>
+              <span style="background:var(--gl);color:#065F46;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">🔢 Tables 1–20</span>
+            </div>
+          </div>
+        </div>
+      </button>
+      <button onclick="showGeoSprint('capitals')" style="background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--sh);border:2px solid transparent;cursor:pointer;text-align:left;transition:all 0.2s;font-family:'Nunito',sans-serif" onmouseover="this.style.borderColor='var(--p)'" onmouseout="this.style.borderColor='transparent'">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:40px">🏛️</div>
+          <div>
+            <div style="font-size:16px;font-weight:900;color:var(--tx)">Capitals Sprint</div>
+            <div style="font-size:12px;color:var(--mu);font-weight:600;margin-top:2px">Match countries to their capitals</div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <span style="background:var(--pl);color:var(--p);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">🌎 Continent filter</span>
+              <span style="background:var(--gl);color:#065F46;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">⭐ Levels 1–5</span>
+            </div>
+          </div>
+        </div>
+      </button>
+      <button onclick="showGeoSprint('maps')" style="background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--sh);border:2px solid transparent;cursor:pointer;text-align:left;transition:all 0.2s;font-family:'Nunito',sans-serif" onmouseover="this.style.borderColor='var(--b)'" onmouseout="this.style.borderColor='transparent'">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:40px">🗺️</div>
+          <div>
+            <div style="font-size:16px;font-weight:900;color:var(--tx)">Map Sprint</div>
+            <div style="font-size:12px;color:var(--mu);font-weight:600;margin-top:2px">Identify highlighted countries on a real map</div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <span style="background:var(--bl);color:#1E40AF;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">🗺️ Real country shapes</span>
+              <span style="background:var(--gl);color:#065F46;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">⭐ Levels 1–5</span>
+            </div>
+          </div>
+        </div>
+      </button>
+      <button onclick="showGeoSprint('flags')" style="background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--sh);border:2px solid transparent;cursor:pointer;text-align:left;transition:all 0.2s;font-family:'Nunito',sans-serif" onmouseover="this.style.borderColor='#f97316'" onmouseout="this.style.borderColor='transparent'">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:40px">🚩</div>
+          <div>
+            <div style="font-size:16px;font-weight:900;color:var(--tx)">Flag Sprint</div>
+            <div style="font-size:12px;color:var(--mu);font-weight:600;margin-top:2px">Name the country from its flag</div>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <span style="background:#fff7ed;color:#9a3412;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">🌎 Continent filter</span>
+              <span style="background:var(--gl);color:#065F46;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:800">⭐ Levels 1–5</span>
+            </div>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+  <!-- MATH SPRINT (original, hidden by default) -->
+  <div id="fs-setup" style="max-width:400px;margin:0 auto;display:none">
     <div style="text-align:center;margin-bottom:20px">
       <span style="font-size:56px;display:inline-block;animation:bounce 2s ease-in-out infinite">⚡</span>
       <h2 style="font-family:'Fredoka One',cursive;font-size:22px;color:var(--p);margin-top:6px">Mental Math Sprint!</h2>
@@ -349,6 +413,123 @@ input:focus,select:focus{border-color:var(--p)}
   </div>
 </div>
 </div>
+
+<!-- GEO SPRINT SCREEN -->
+<div id="s-geosprint" class="screen">
+<div class="topbar"><button class="btn btn-ghost btn-sm" onclick="backToSprintHub()">← Back</button><span class="topbar-title" id="gs-topbar-title">🌍 GeoSprint</span><div style="width:60px"></div></div>
+<div class="content" style="padding:14px">
+
+  <!-- SETUP -->
+  <div id="gs-setup" style="max-width:400px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:16px">
+      <span id="gs-mode-icon" style="font-size:44px;display:inline-block;animation:bounce 2s ease-in-out infinite">🌍</span>
+      <h2 id="gs-mode-title" style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--p);margin-top:6px">GeoSprint Setup</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+
+      <!-- Direction (capitals only) -->
+      <div id="gs-dir-wrap" class="card card-sm" style="display:none">
+        <div style="font-weight:800;font-size:13px;margin-bottom:8px">Question Direction</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="gs-dc2" class="btn btn-sm btn-primary" onclick="gsSetDir('c2cap')">🌍 Country → Capital</button>
+          <button id="gs-dc2r" class="btn btn-sm btn-secondary" onclick="gsSetDir('cap2c')">🏛️ Capital → Country</button>
+        </div>
+      </div>
+
+      <!-- Continent -->
+      <div class="card card-sm">
+        <div style="font-weight:800;font-size:13px;margin-bottom:8px">Continents</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="gs-cc">
+          <button class="btn btn-sm btn-primary" data-v="all" onclick="gsToglCont(this)">🌐 All</button>
+          <button class="btn btn-sm btn-secondary" data-v="Africa" onclick="gsToglCont(this)">🌍 Africa</button>
+          <button class="btn btn-sm btn-secondary" data-v="Asia" onclick="gsToglCont(this)">🌏 Asia</button>
+          <button class="btn btn-sm btn-secondary" data-v="Europe" onclick="gsToglCont(this)">🇪🇺 Europe</button>
+          <button class="btn btn-sm btn-secondary" data-v="North America" onclick="gsToglCont(this)">🌎 N. America</button>
+          <button class="btn btn-sm btn-secondary" data-v="South America" onclick="gsToglCont(this)">🌎 S. America</button>
+          <button class="btn btn-sm btn-secondary" data-v="Oceania" onclick="gsToglCont(this)">🏝️ Oceania</button>
+        </div>
+      </div>
+
+      <!-- Level -->
+      <div class="card card-sm">
+        <div style="font-weight:800;font-size:13px;margin-bottom:4px">Difficulty Level</div>
+        <div id="gs-ldesc" style="font-size:11px;color:var(--mu);margin-bottom:10px">L1: ~30 most famous countries, easy distractors</div>
+        <input type="range" id="gs-lslider" min="1" max="5" value="1" oninput="gsUpdLv(this.value)" style="width:100%;accent-color:var(--p);cursor:pointer">
+        <div style="display:flex;justify-content:space-between;margin-top:5px">
+          <span style="font-size:10px;font-weight:700;color:var(--mu)">L1 Easy</span>
+          <span id="gs-lbadge" style="font-size:12px;font-weight:900;color:var(--p)">Level 1 ⭐</span>
+          <span style="font-size:10px;font-weight:700;color:var(--mu)">L5 Expert</span>
+        </div>
+      </div>
+
+      <!-- Count -->
+      <div class="card card-sm">
+        <div style="font-weight:800;font-size:13px;margin-bottom:8px">Number of Questions</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap" id="gs-qc">
+          <button class="btn btn-sm btn-primary" data-v="10" onclick="gsSetQ(this)">10</button>
+          <button class="btn btn-sm btn-secondary" data-v="20" onclick="gsSetQ(this)">20</button>
+          <button class="btn btn-sm btn-secondary" data-v="30" onclick="gsSetQ(this)">30</button>
+          <button class="btn btn-sm btn-secondary" data-v="50" onclick="gsSetQ(this)">50</button>
+          <button class="btn btn-sm btn-secondary" data-v="0" onclick="gsSetQ(this)">All</button>
+        </div>
+      </div>
+
+      <div id="gs-pinfo" style="background:var(--pl);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--p)">📚 Calculating...</div>
+      <div id="gs-map-status" style="display:none;background:var(--yl);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:#92400E">⏳ Loading map data...</div>
+      <button class="btn btn-yellow btn-full btn-lg" onclick="gsStartSprint()">🚀 Start Sprint!</button>
+    </div>
+  </div>
+
+  <!-- QUESTION -->
+  <div id="gs-question" style="display:none;max-width:400px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span id="gs-qctr" class="badge badge-p">Q 1/10</span>
+      <span id="gs-qscore" style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--y)">⭐ 0</span>
+      <span id="gs-qstreak" style="font-family:'Fredoka One',cursive;font-size:16px;color:#f97316">🔥 0</span>
+    </div>
+    <div class="progress-wrap" style="margin-bottom:8px"><div id="gs-qprog" class="progress-fill" style="width:0%"></div></div>
+    <div style="height:6px;background:#fce7d6;border-radius:10px;margin-bottom:12px"><div id="gs-tbar" style="height:6px;background:#f97316;border-radius:10px;width:100%;transition:width 0.1s linear"></div></div>
+
+    <div style="text-align:center;font-size:40px;margin-bottom:8px" id="gs-mascot">🐨</div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <span id="gs-qmtag" class="badge badge-p"></span>
+        <span id="gs-qltag" class="badge badge-y"></span>
+      </div>
+      <div id="gs-qvis" style="display:none;margin-bottom:12px;text-align:center"></div>
+      <div id="gs-qtxt" style="font-size:15px;font-weight:800;color:var(--tx);line-height:1.5;margin-bottom:14px"></div>
+      <div id="gs-qopts" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+    <div id="gs-qfb" style="display:none;border-radius:14px;padding:12px 16px;font-size:13px;font-weight:700;margin-bottom:10px"></div>
+    <button id="gs-bnext" onclick="gsNextQ()" style="display:none" class="btn btn-primary btn-full">Next →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="gs-results" style="display:none;max-width:400px;margin:0 auto;text-align:center">
+    <div id="gs-rmascot" style="font-size:60px;margin-bottom:8px"></div>
+    <div id="gs-rtitle" style="font-family:'Fredoka One',cursive;font-size:24px;color:var(--p);margin-bottom:4px"></div>
+    <div id="gs-rsub" style="font-size:13px;color:var(--mu);font-weight:700;margin-bottom:18px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="card card-sm" style="text-align:center"><div id="gs-rcorrect" style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--g)"></div><div style="font-size:11px;color:var(--mu)">Correct</div></div>
+      <div class="card card-sm" style="text-align:center"><div id="gs-racc" style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--p)"></div><div style="font-size:11px;color:var(--mu)">Accuracy</div></div>
+      <div class="card card-sm" style="text-align:center"><div id="gs-rtime" style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--b)"></div><div style="font-size:11px;color:var(--mu)">Total Time</div></div>
+      <div class="card card-sm" style="text-align:center"><div id="gs-rstreak" style="font-family:'Fredoka One',cursive;font-size:26px;color:#f97316"></div><div style="font-size:11px;color:var(--mu)">Best Streak 🔥</div></div>
+    </div>
+    <div id="gs-rwwrap" style="display:none;margin-bottom:14px;text-align:left">
+      <div style="font-weight:800;font-size:13px;color:var(--tx);margin-bottom:8px">📖 Review — What to remember:</div>
+      <div id="gs-rwlist" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-yellow" onclick="gsStartSprint()">🔁 Play Again</button>
+      <button class="btn btn-secondary" onclick="gsGoSetup()">⚙️ Change Setup</button>
+      <button class="btn btn-secondary" onclick="backToSprintHub()">🏠 Sprint Hub</button>
+    </div>
+  </div>
+</div>
+</div>
+
 
 <!-- PARENT LOGIN -->
 <div id="s-parent-login" class="screen">
@@ -592,7 +773,7 @@ function showTab(tab){
   const el=document.getElementById('tab-content');
   if(tab==='home')renderHomeTab(el);
   else if(tab==='learn')renderLearnTab(el);
-  else if(tab==='sprint'){go('s-sprint');renderSprintHistory();return;}
+  else if(tab==='sprint'){go('s-sprint');showSprintHub();return;}
   else if(tab==='badges')renderBadgesTab(el);
   else if(tab==='profile')renderProfileTab(el);
 }
@@ -2185,6 +2366,498 @@ async function saveNewQuestion(){
   showDashTab('bank');
 }
 
+
+// ═══════════════════════════════════════════════════════════════════
+// GEOSPRINT — Capitals, Map, Flag sprint modes
+// ═══════════════════════════════════════════════════════════════════
+var GS = {
+  mode:'capitals', dir:'c2cap', selConts:['all'], level:1, qCount:10,
+  questions:[], qIdx:0, score:0, streak:0, bestStreak:0,
+  wrongList:[], totalTime:0, qStart:0, timerIv:null, worldData:null,
+  TPERQ:20
+};
+
+var GS_DB = [
+{n:"Algeria",c:"Algiers",cont:"Africa",iso:"dz",iso3n:12,lv:2},
+{n:"Angola",c:"Luanda",cont:"Africa",iso:"ao",iso3n:24,lv:3},
+{n:"Benin",c:"Porto-Novo",cont:"Africa",iso:"bj",iso3n:204,lv:4},
+{n:"Botswana",c:"Gaborone",cont:"Africa",iso:"bw",iso3n:72,lv:3},
+{n:"Burkina Faso",c:"Ouagadougou",cont:"Africa",iso:"bf",iso3n:854,lv:4},
+{n:"Burundi",c:"Gitega",cont:"Africa",iso:"bi",iso3n:108,lv:5},
+{n:"Cameroon",c:"Yaounde",cont:"Africa",iso:"cm",iso3n:120,lv:3},
+{n:"Central African Republic",c:"Bangui",cont:"Africa",iso:"cf",iso3n:140,lv:5},
+{n:"Chad",c:"NDjamena",cont:"Africa",iso:"td",iso3n:148,lv:4},
+{n:"DR Congo",c:"Kinshasa",cont:"Africa",iso:"cd",iso3n:180,lv:3},
+{n:"Republic of Congo",c:"Brazzaville",cont:"Africa",iso:"cg",iso3n:178,lv:4},
+{n:"Djibouti",c:"Djibouti City",cont:"Africa",iso:"dj",iso3n:262,lv:5},
+{n:"Egypt",c:"Cairo",cont:"Africa",iso:"eg",iso3n:818,lv:1},
+{n:"Equatorial Guinea",c:"Malabo",cont:"Africa",iso:"gq",iso3n:226,lv:5},
+{n:"Eritrea",c:"Asmara",cont:"Africa",iso:"er",iso3n:232,lv:5},
+{n:"Eswatini",c:"Mbabane",cont:"Africa",iso:"sz",iso3n:748,lv:5},
+{n:"Ethiopia",c:"Addis Ababa",cont:"Africa",iso:"et",iso3n:231,lv:2},
+{n:"Gabon",c:"Libreville",cont:"Africa",iso:"ga",iso3n:266,lv:4},
+{n:"Gambia",c:"Banjul",cont:"Africa",iso:"gm",iso3n:270,lv:5},
+{n:"Ghana",c:"Accra",cont:"Africa",iso:"gh",iso3n:288,lv:2},
+{n:"Guinea",c:"Conakry",cont:"Africa",iso:"gn",iso3n:324,lv:4},
+{n:"Guinea-Bissau",c:"Bissau",cont:"Africa",iso:"gw",iso3n:624,lv:5},
+{n:"Ivory Coast",c:"Yamoussoukro",cont:"Africa",iso:"ci",iso3n:384,lv:3},
+{n:"Kenya",c:"Nairobi",cont:"Africa",iso:"ke",iso3n:404,lv:2},
+{n:"Lesotho",c:"Maseru",cont:"Africa",iso:"ls",iso3n:426,lv:5},
+{n:"Liberia",c:"Monrovia",cont:"Africa",iso:"lr",iso3n:430,lv:4},
+{n:"Libya",c:"Tripoli",cont:"Africa",iso:"ly",iso3n:434,lv:3},
+{n:"Madagascar",c:"Antananarivo",cont:"Africa",iso:"mg",iso3n:450,lv:3},
+{n:"Malawi",c:"Lilongwe",cont:"Africa",iso:"mw",iso3n:454,lv:4},
+{n:"Mali",c:"Bamako",cont:"Africa",iso:"ml",iso3n:466,lv:3},
+{n:"Mauritania",c:"Nouakchott",cont:"Africa",iso:"mr",iso3n:478,lv:4},
+{n:"Morocco",c:"Rabat",cont:"Africa",iso:"ma",iso3n:504,lv:2},
+{n:"Mozambique",c:"Maputo",cont:"Africa",iso:"mz",iso3n:508,lv:4},
+{n:"Namibia",c:"Windhoek",cont:"Africa",iso:"na",iso3n:516,lv:3},
+{n:"Niger",c:"Niamey",cont:"Africa",iso:"ne",iso3n:562,lv:4},
+{n:"Nigeria",c:"Abuja",cont:"Africa",iso:"ng",iso3n:566,lv:1},
+{n:"Rwanda",c:"Kigali",cont:"Africa",iso:"rw",iso3n:646,lv:3},
+{n:"Senegal",c:"Dakar",cont:"Africa",iso:"sn",iso3n:686,lv:3},
+{n:"Sierra Leone",c:"Freetown",cont:"Africa",iso:"sl",iso3n:694,lv:4},
+{n:"Somalia",c:"Mogadishu",cont:"Africa",iso:"so",iso3n:706,lv:3},
+{n:"South Africa",c:"Pretoria",cont:"Africa",iso:"za",iso3n:710,lv:1},
+{n:"South Sudan",c:"Juba",cont:"Africa",iso:"ss",iso3n:728,lv:4},
+{n:"Sudan",c:"Khartoum",cont:"Africa",iso:"sd",iso3n:729,lv:3},
+{n:"Tanzania",c:"Dodoma",cont:"Africa",iso:"tz",iso3n:834,lv:2},
+{n:"Togo",c:"Lome",cont:"Africa",iso:"tg",iso3n:768,lv:4},
+{n:"Tunisia",c:"Tunis",cont:"Africa",iso:"tn",iso3n:788,lv:2},
+{n:"Uganda",c:"Kampala",cont:"Africa",iso:"ug",iso3n:800,lv:3},
+{n:"Zambia",c:"Lusaka",cont:"Africa",iso:"zm",iso3n:894,lv:3},
+{n:"Zimbabwe",c:"Harare",cont:"Africa",iso:"zw",iso3n:716,lv:3},
+{n:"Afghanistan",c:"Kabul",cont:"Asia",iso:"af",iso3n:4,lv:2},
+{n:"Armenia",c:"Yerevan",cont:"Asia",iso:"am",iso3n:51,lv:3},
+{n:"Azerbaijan",c:"Baku",cont:"Asia",iso:"az",iso3n:31,lv:3},
+{n:"Bahrain",c:"Manama",cont:"Asia",iso:"bh",iso3n:48,lv:3},
+{n:"Bangladesh",c:"Dhaka",cont:"Asia",iso:"bd",iso3n:50,lv:2},
+{n:"Bhutan",c:"Thimphu",cont:"Asia",iso:"bt",iso3n:64,lv:4},
+{n:"Brunei",c:"Bandar Seri Begawan",cont:"Asia",iso:"bn",iso3n:96,lv:4},
+{n:"Cambodia",c:"Phnom Penh",cont:"Asia",iso:"kh",iso3n:116,lv:3},
+{n:"China",c:"Beijing",cont:"Asia",iso:"cn",iso3n:156,lv:1},
+{n:"Cyprus",c:"Nicosia",cont:"Asia",iso:"cy",iso3n:196,lv:3},
+{n:"Georgia",c:"Tbilisi",cont:"Asia",iso:"ge",iso3n:268,lv:3},
+{n:"India",c:"New Delhi",cont:"Asia",iso:"in",iso3n:356,lv:1},
+{n:"Indonesia",c:"Jakarta",cont:"Asia",iso:"id",iso3n:360,lv:1},
+{n:"Iran",c:"Tehran",cont:"Asia",iso:"ir",iso3n:364,lv:2},
+{n:"Iraq",c:"Baghdad",cont:"Asia",iso:"iq",iso3n:368,lv:2},
+{n:"Israel",c:"Jerusalem",cont:"Asia",iso:"il",iso3n:376,lv:2},
+{n:"Japan",c:"Tokyo",cont:"Asia",iso:"jp",iso3n:392,lv:1},
+{n:"Jordan",c:"Amman",cont:"Asia",iso:"jo",iso3n:400,lv:2},
+{n:"Kazakhstan",c:"Astana",cont:"Asia",iso:"kz",iso3n:398,lv:3},
+{n:"Kuwait",c:"Kuwait City",cont:"Asia",iso:"kw",iso3n:414,lv:3},
+{n:"Kyrgyzstan",c:"Bishkek",cont:"Asia",iso:"kg",iso3n:417,lv:5},
+{n:"Laos",c:"Vientiane",cont:"Asia",iso:"la",iso3n:418,lv:4},
+{n:"Lebanon",c:"Beirut",cont:"Asia",iso:"lb",iso3n:422,lv:1},
+{n:"Malaysia",c:"Kuala Lumpur",cont:"Asia",iso:"my",iso3n:458,lv:2},
+{n:"Mongolia",c:"Ulaanbaatar",cont:"Asia",iso:"mn",iso3n:496,lv:3},
+{n:"Myanmar",c:"Naypyidaw",cont:"Asia",iso:"mm",iso3n:104,lv:3},
+{n:"Nepal",c:"Kathmandu",cont:"Asia",iso:"np",iso3n:524,lv:2},
+{n:"North Korea",c:"Pyongyang",cont:"Asia",iso:"kp",iso3n:408,lv:3},
+{n:"Oman",c:"Muscat",cont:"Asia",iso:"om",iso3n:512,lv:3},
+{n:"Pakistan",c:"Islamabad",cont:"Asia",iso:"pk",iso3n:586,lv:2},
+{n:"Philippines",c:"Manila",cont:"Asia",iso:"ph",iso3n:608,lv:2},
+{n:"Qatar",c:"Doha",cont:"Asia",iso:"qa",iso3n:634,lv:2},
+{n:"Saudi Arabia",c:"Riyadh",cont:"Asia",iso:"sa",iso3n:682,lv:1},
+{n:"Singapore",c:"Singapore",cont:"Asia",iso:"sg",iso3n:702,lv:2},
+{n:"South Korea",c:"Seoul",cont:"Asia",iso:"kr",iso3n:410,lv:1},
+{n:"Sri Lanka",c:"Sri Jayawardenepura Kotte",cont:"Asia",iso:"lk",iso3n:144,lv:3},
+{n:"Syria",c:"Damascus",cont:"Asia",iso:"sy",iso3n:760,lv:2},
+{n:"Taiwan",c:"Taipei",cont:"Asia",iso:"tw",iso3n:158,lv:2},
+{n:"Tajikistan",c:"Dushanbe",cont:"Asia",iso:"tj",iso3n:762,lv:5},
+{n:"Thailand",c:"Bangkok",cont:"Asia",iso:"th",iso3n:764,lv:2},
+{n:"Turkey",c:"Ankara",cont:"Asia",iso:"tr",iso3n:792,lv:1},
+{n:"Turkmenistan",c:"Ashgabat",cont:"Asia",iso:"tm",iso3n:795,lv:5},
+{n:"UAE",c:"Abu Dhabi",cont:"Asia",iso:"ae",iso3n:784,lv:2},
+{n:"Uzbekistan",c:"Tashkent",cont:"Asia",iso:"uz",iso3n:860,lv:4},
+{n:"Vietnam",c:"Hanoi",cont:"Asia",iso:"vn",iso3n:704,lv:2},
+{n:"Yemen",c:"Sanaa",cont:"Asia",iso:"ye",iso3n:887,lv:3},
+{n:"Albania",c:"Tirana",cont:"Europe",iso:"al",iso3n:8,lv:3},
+{n:"Austria",c:"Vienna",cont:"Europe",iso:"at",iso3n:40,lv:2},
+{n:"Belarus",c:"Minsk",cont:"Europe",iso:"by",iso3n:112,lv:3},
+{n:"Belgium",c:"Brussels",cont:"Europe",iso:"be",iso3n:56,lv:2},
+{n:"Bosnia and Herzegovina",c:"Sarajevo",cont:"Europe",iso:"ba",iso3n:70,lv:4},
+{n:"Bulgaria",c:"Sofia",cont:"Europe",iso:"bg",iso3n:100,lv:3},
+{n:"Croatia",c:"Zagreb",cont:"Europe",iso:"hr",iso3n:191,lv:3},
+{n:"Czech Republic",c:"Prague",cont:"Europe",iso:"cz",iso3n:203,lv:2},
+{n:"Denmark",c:"Copenhagen",cont:"Europe",iso:"dk",iso3n:208,lv:2},
+{n:"Estonia",c:"Tallinn",cont:"Europe",iso:"ee",iso3n:233,lv:4},
+{n:"Finland",c:"Helsinki",cont:"Europe",iso:"fi",iso3n:246,lv:2},
+{n:"France",c:"Paris",cont:"Europe",iso:"fr",iso3n:250,lv:1},
+{n:"Germany",c:"Berlin",cont:"Europe",iso:"de",iso3n:276,lv:1},
+{n:"Greece",c:"Athens",cont:"Europe",iso:"gr",iso3n:300,lv:1},
+{n:"Hungary",c:"Budapest",cont:"Europe",iso:"hu",iso3n:348,lv:2},
+{n:"Iceland",c:"Reykjavik",cont:"Europe",iso:"is",iso3n:352,lv:3},
+{n:"Ireland",c:"Dublin",cont:"Europe",iso:"ie",iso3n:372,lv:2},
+{n:"Italy",c:"Rome",cont:"Europe",iso:"it",iso3n:380,lv:1},
+{n:"Latvia",c:"Riga",cont:"Europe",iso:"lv",iso3n:428,lv:4},
+{n:"Lithuania",c:"Vilnius",cont:"Europe",iso:"lt",iso3n:440,lv:4},
+{n:"Luxembourg",c:"Luxembourg City",cont:"Europe",iso:"lu",iso3n:442,lv:3},
+{n:"Moldova",c:"Chisinau",cont:"Europe",iso:"md",iso3n:498,lv:4},
+{n:"Montenegro",c:"Podgorica",cont:"Europe",iso:"me",iso3n:499,lv:5},
+{n:"Netherlands",c:"Amsterdam",cont:"Europe",iso:"nl",iso3n:528,lv:1},
+{n:"North Macedonia",c:"Skopje",cont:"Europe",iso:"mk",iso3n:807,lv:5},
+{n:"Norway",c:"Oslo",cont:"Europe",iso:"no",iso3n:578,lv:1},
+{n:"Poland",c:"Warsaw",cont:"Europe",iso:"pl",iso3n:616,lv:2},
+{n:"Portugal",c:"Lisbon",cont:"Europe",iso:"pt",iso3n:620,lv:1},
+{n:"Romania",c:"Bucharest",cont:"Europe",iso:"ro",iso3n:642,lv:2},
+{n:"Russia",c:"Moscow",cont:"Europe",iso:"ru",iso3n:643,lv:1},
+{n:"Serbia",c:"Belgrade",cont:"Europe",iso:"rs",iso3n:688,lv:3},
+{n:"Slovakia",c:"Bratislava",cont:"Europe",iso:"sk",iso3n:703,lv:3},
+{n:"Slovenia",c:"Ljubljana",cont:"Europe",iso:"si",iso3n:705,lv:4},
+{n:"Spain",c:"Madrid",cont:"Europe",iso:"es",iso3n:724,lv:1},
+{n:"Sweden",c:"Stockholm",cont:"Europe",iso:"se",iso3n:752,lv:1},
+{n:"Switzerland",c:"Bern",cont:"Europe",iso:"ch",iso3n:756,lv:2},
+{n:"Ukraine",c:"Kyiv",cont:"Europe",iso:"ua",iso3n:804,lv:2},
+{n:"United Kingdom",c:"London",cont:"Europe",iso:"gb",iso3n:826,lv:1},
+{n:"Canada",c:"Ottawa",cont:"North America",iso:"ca",iso3n:124,lv:1},
+{n:"Cuba",c:"Havana",cont:"North America",iso:"cu",iso3n:192,lv:2},
+{n:"Dominican Republic",c:"Santo Domingo",cont:"North America",iso:"do",iso3n:214,lv:3},
+{n:"El Salvador",c:"San Salvador",cont:"North America",iso:"sv",iso3n:222,lv:3},
+{n:"Guatemala",c:"Guatemala City",cont:"North America",iso:"gt",iso3n:320,lv:3},
+{n:"Haiti",c:"Port-au-Prince",cont:"North America",iso:"ht",iso3n:332,lv:3},
+{n:"Honduras",c:"Tegucigalpa",cont:"North America",iso:"hn",iso3n:340,lv:3},
+{n:"Jamaica",c:"Kingston",cont:"North America",iso:"jm",iso3n:388,lv:2},
+{n:"Mexico",c:"Mexico City",cont:"North America",iso:"mx",iso3n:484,lv:1},
+{n:"Nicaragua",c:"Managua",cont:"North America",iso:"ni",iso3n:558,lv:3},
+{n:"Panama",c:"Panama City",cont:"North America",iso:"pa",iso3n:591,lv:3},
+{n:"United States",c:"Washington DC",cont:"North America",iso:"us",iso3n:840,lv:1},
+{n:"Costa Rica",c:"San Jose",cont:"North America",iso:"cr",iso3n:188,lv:3},
+{n:"Belize",c:"Belmopan",cont:"North America",iso:"bz",iso3n:84,lv:4},
+{n:"Argentina",c:"Buenos Aires",cont:"South America",iso:"ar",iso3n:32,lv:1},
+{n:"Bolivia",c:"Sucre",cont:"South America",iso:"bo",iso3n:68,lv:3},
+{n:"Brazil",c:"Brasilia",cont:"South America",iso:"br",iso3n:76,lv:1},
+{n:"Chile",c:"Santiago",cont:"South America",iso:"cl",iso3n:152,lv:2},
+{n:"Colombia",c:"Bogota",cont:"South America",iso:"co",iso3n:170,lv:1},
+{n:"Ecuador",c:"Quito",cont:"South America",iso:"ec",iso3n:218,lv:2},
+{n:"Guyana",c:"Georgetown",cont:"South America",iso:"gy",iso3n:328,lv:4},
+{n:"Paraguay",c:"Asuncion",cont:"South America",iso:"py",iso3n:600,lv:3},
+{n:"Peru",c:"Lima",cont:"South America",iso:"pe",iso3n:604,lv:1},
+{n:"Suriname",c:"Paramaribo",cont:"South America",iso:"sr",iso3n:740,lv:5},
+{n:"Uruguay",c:"Montevideo",cont:"South America",iso:"uy",iso3n:858,lv:3},
+{n:"Venezuela",c:"Caracas",cont:"South America",iso:"ve",iso3n:862,lv:2},
+{n:"Australia",c:"Canberra",cont:"Oceania",iso:"au",iso3n:36,lv:1},
+{n:"Fiji",c:"Suva",cont:"Oceania",iso:"fj",iso3n:242,lv:3},
+{n:"New Zealand",c:"Wellington",cont:"Oceania",iso:"nz",iso3n:554,lv:1},
+{n:"Papua New Guinea",c:"Port Moresby",cont:"Oceania",iso:"pg",iso3n:598,lv:3},
+{n:"Solomon Islands",c:"Honiara",cont:"Oceania",iso:"sb",iso3n:90,lv:5},
+{n:"Vanuatu",c:"Port Vila",cont:"Oceania",iso:"vu",iso3n:548,lv:5}
+];
+
+var GS_LVDESCS = ["","L1: ~30 most famous countries, easy distractors","L2: ~60 well-known countries, moderate distractors","L3: ~100 countries, same-region distractors","L4: ~140 countries, tricky similar distractors","L5: All 195 countries, expert-level distractors"];
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function showSprintHub(){
+  document.getElementById('sprint-hub').style.display='block';
+  document.getElementById('fs-setup').style.display='none';
+  document.getElementById('fs-active').style.display='none';
+  document.getElementById('fs-results').style.display='none';
+}
+
+function showMathSprint(){
+  document.getElementById('sprint-hub').style.display='none';
+  document.getElementById('fs-setup').style.display='block';
+  renderSprintHistory();
+}
+
+function showGeoSprint(m){
+  GS.mode=m;
+  var icons={capitals:'🏛️',maps:'🗺️',flags:'🚩'};
+  var titles={capitals:'Capitals Sprint',maps:'Map Sprint',flags:'Flag Sprint'};
+  document.getElementById('gs-topbar-title').textContent=icons[m]+' '+titles[m];
+  document.getElementById('gs-mode-icon').textContent=icons[m];
+  document.getElementById('gs-mode-title').textContent=titles[m]+' Setup';
+  document.getElementById('gs-dir-wrap').style.display=m==='capitals'?'block':'none';
+  if(m==='maps'&&!GS.worldData){
+    document.getElementById('gs-map-status').style.display='block';
+    gsLoadMapData(function(){document.getElementById('gs-map-status').style.display='none';});
+  }
+  gsGoSetup();
+  go('s-geosprint');
+}
+
+function backToSprintHub(){
+  clearInterval(GS.timerIv);
+  go('s-sprint');
+  showSprintHub();
+}
+
+function gsGoSetup(){
+  document.getElementById('gs-setup').style.display='block';
+  document.getElementById('gs-question').style.display='none';
+  document.getElementById('gs-results').style.display='none';
+  gsRefreshPool();
+}
+
+// ── Map data loader ───────────────────────────────────────────────────────────
+function gsLoadMapData(cb){
+  if(GS.worldData){if(cb)cb(GS.worldData);return;}
+  d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(function(data){
+    GS.worldData=data;
+    if(cb)cb(data);
+  }).catch(function(e){console.error('Map load failed',e);});
+}
+
+// Preload map data immediately
+gsLoadMapData(null);
+
+// ── Setup controls ────────────────────────────────────────────────────────────
+function gsSetDir(d){
+  GS.dir=d;
+  document.getElementById('gs-dc2').className='btn btn-sm '+(d==='c2cap'?'btn-primary':'btn-secondary');
+  document.getElementById('gs-dc2r').className='btn btn-sm '+(d==='cap2c'?'btn-primary':'btn-secondary');
+}
+
+function gsToglCont(btn){
+  var v=btn.dataset.v;
+  if(v==='all'){GS.selConts=['all'];}
+  else{
+    GS.selConts=GS.selConts.filter(function(x){return x!=='all';});
+    var idx=GS.selConts.indexOf(v);
+    if(idx>=0)GS.selConts.splice(idx,1);else GS.selConts.push(v);
+    if(GS.selConts.length===0)GS.selConts=['all'];
+  }
+  document.querySelectorAll('#gs-cc .btn').forEach(function(b){
+    var bv=b.dataset.v;
+    var on=(bv==='all'&&GS.selConts[0]==='all')||(bv!=='all'&&GS.selConts.indexOf(bv)>=0);
+    b.className='btn btn-sm '+(on?'btn-primary':'btn-secondary');
+  });
+  gsRefreshPool();
+}
+
+function gsUpdLv(v){
+  GS.level=parseInt(v);
+  document.getElementById('gs-ldesc').textContent=GS_LVDESCS[GS.level];
+  var s='';for(var i=0;i<GS.level;i++)s+='⭐';
+  document.getElementById('gs-lbadge').textContent='Level '+GS.level+' '+s;
+  gsRefreshPool();
+}
+
+function gsSetQ(btn){
+  document.querySelectorAll('#gs-qc .btn').forEach(function(b){b.className='btn btn-sm btn-secondary';});
+  btn.className='btn btn-sm btn-primary';
+  GS.qCount=parseInt(btn.dataset.v);
+  gsRefreshPool();
+}
+
+function gsGetPool(){
+  var p=GS_DB.filter(function(c){return c.lv<=GS.level;});
+  if(GS.selConts[0]!=='all')p=p.filter(function(c){return GS.selConts.indexOf(c.cont)>=0;});
+  return p;
+}
+
+function gsRefreshPool(){
+  var p=gsGetPool();
+  var n=GS.qCount===0?p.length:Math.min(GS.qCount,p.length);
+  document.getElementById('gs-pinfo').innerHTML='📚 Pool: <strong>'+p.length+' countries</strong> · Sprint: <strong>'+n+' questions</strong>';
+}
+
+// ── Question building ─────────────────────────────────────────────────────────
+function gsShuffle(arr){
+  var a=arr.slice();
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+function gsGetDistractors(ctry,pool,field,n){
+  var cands=pool.filter(function(c){return c!==ctry;});
+  if(GS.level>=3){
+    var same=gsShuffle(cands.filter(function(c){return c.cont===ctry.cont;}));
+    var other=gsShuffle(cands.filter(function(c){return c.cont!==ctry.cont;}));
+    cands=same.concat(other);
+  }else{cands=gsShuffle(cands);}
+  var res=[];
+  for(var i=0;i<cands.length&&res.length<n;i++){var val=cands[i][field];if(res.indexOf(val)<0)res.push(val);}
+  return res;
+}
+
+function gsBuildQuestions(){
+  var pool=gsGetPool();
+  var sel=gsShuffle(pool).slice(0,GS.qCount===0?pool.length:Math.min(GS.qCount,pool.length));
+  GS.questions=sel.map(function(ctry){
+    var text,answer,distractors,visual=null;
+    if(GS.mode==='capitals'){
+      if(GS.dir==='c2cap'){text='What is the capital of '+ctry.n+'?';answer=ctry.c;distractors=gsGetDistractors(ctry,pool,'c',3);}
+      else{text=ctry.c+' is the capital of which country?';answer=ctry.n;distractors=gsGetDistractors(ctry,pool,'n',3);}
+    }else if(GS.mode==='flags'){
+      text='Which country does this flag belong to?';answer=ctry.n;distractors=gsGetDistractors(ctry,pool,'n',3);visual={type:'flag',iso:ctry.iso};
+    }else{
+      text='Which country is highlighted on the map?';answer=ctry.n;distractors=gsGetDistractors(ctry,pool,'n',3);visual={type:'map',iso3n:ctry.iso3n,cont:ctry.cont};
+    }
+    return{text:text,answer:answer,opts:gsShuffle([answer].concat(distractors)),visual:visual,ctry:ctry};
+  });
+}
+
+// ── Sprint control ────────────────────────────────────────────────────────────
+function gsStartSprint(){
+  if(GS.mode==='maps'&&!GS.worldData){alert('Map data is still loading. Please wait a moment.');return;}
+  gsBuildQuestions();
+  GS.qIdx=0;GS.score=0;GS.streak=0;GS.bestStreak=0;GS.wrongList=[];GS.totalTime=0;
+  document.getElementById('gs-setup').style.display='none';
+  document.getElementById('gs-results').style.display='none';
+  document.getElementById('gs-question').style.display='block';
+  gsRenderQ();
+}
+
+function gsRenderQ(){
+  var q=GS.questions[GS.qIdx];
+  document.getElementById('gs-qctr').textContent='Q '+(GS.qIdx+1)+' / '+GS.questions.length;
+  document.getElementById('gs-qscore').textContent='⭐ '+GS.score;
+  document.getElementById('gs-qstreak').textContent='🔥 '+GS.streak;
+  document.getElementById('gs-qprog').style.width=((GS.qIdx/GS.questions.length)*100)+'%';
+  document.getElementById('gs-qmtag').textContent={capitals:'🏛️ Capitals',maps:'🗺️ Map',flags:'🚩 Flags'}[GS.mode];
+  var s='';for(var i=0;i<GS.level;i++)s+='⭐';
+  document.getElementById('gs-qltag').textContent=s+' L'+GS.level;
+  document.getElementById('gs-qtxt').textContent=q.text;
+  document.getElementById('gs-qfb').style.display='none';
+  document.getElementById('gs-bnext').style.display='none';
+  document.getElementById('gs-mascot').textContent='🐨';
+  document.getElementById('gs-tbar').style.width='100%';
+  document.getElementById('gs-tbar').style.background='#f97316';
+
+  var vis=document.getElementById('gs-qvis');
+  vis.innerHTML='';vis.style.display='none';
+  if(q.visual){
+    vis.style.display='block';
+    if(q.visual.type==='flag'){
+      vis.innerHTML='<img src="https://flagcdn.com/w160/'+q.visual.iso+'.png" alt="Flag" style="max-width:180px;border-radius:10px;border:2px solid var(--br);box-shadow:0 3px 10px rgba(0,0,0,0.1)">';
+    }else if(q.visual.type==='map'){
+      gsRenderMap(vis,q.visual.iso3n,q.visual.cont);
+    }
+  }
+
+  var od=document.getElementById('gs-qopts');
+  od.innerHTML='';
+  q.opts.forEach(function(opt){
+    var btn=document.createElement('button');
+    btn.className='btn btn-secondary';
+    btn.style.cssText='width:100%;text-align:left;padding:12px 16px;font-size:14px;font-weight:700;border-radius:14px;margin-bottom:0;justify-content:flex-start;';
+    btn.textContent=opt;
+    btn.onclick=function(){gsCheckAns(opt,q);};
+    od.appendChild(btn);
+  });
+  gsStartTimer();
+}
+
+// ── D3 Map renderer ───────────────────────────────────────────────────────────
+function gsRenderMap(container,targetIso3n,continent){
+  var W=320,H=200;
+  var wrap=document.createElement('div');
+  wrap.style.cssText='border:2px solid var(--br);border-radius:14px;overflow:hidden;background:#dbeafe;max-width:340px;margin:0 auto';
+
+  var svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svgEl.setAttribute('viewBox','0 0 '+W+' '+H);
+  svgEl.setAttribute('width','100%');
+  svgEl.style.display='block';
+  wrap.appendChild(svgEl);
+
+  var lbl=document.createElement('div');
+  lbl.style.cssText='text-align:center;padding:5px 8px;font-size:11px;font-weight:800;color:var(--p);background:var(--pl)';
+  lbl.textContent=continent+' — Which country is highlighted in purple?';
+  wrap.appendChild(lbl);
+  container.appendChild(wrap);
+
+  var contISOs=GS_DB.filter(function(d){return d.cont===continent;}).map(function(d){return d.iso3n;});
+  var allFeatures=topojson.feature(GS.worldData,GS.worldData.objects.countries).features;
+  var contFeatures=allFeatures.filter(function(f){return contISOs.indexOf(parseInt(f.id))>=0;});
+  if(contFeatures.length===0)contFeatures=allFeatures;
+
+  var projection=d3.geoMercator().fitExtent([[8,8],[W-8,H-8]],{type:'FeatureCollection',features:contFeatures});
+  var path=d3.geoPath().projection(projection);
+  var svg=d3.select(svgEl);
+
+  svg.selectAll('path').data(contFeatures).enter().append('path')
+    .attr('d',path)
+    .attr('fill',function(f){return parseInt(f.id)===targetIso3n?'#7C3AED':'#c4b5fd';})
+    .attr('stroke','white')
+    .attr('stroke-width',0.8)
+    .attr('opacity',function(f){return parseInt(f.id)===targetIso3n?1:0.65;});
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────────────
+function gsStartTimer(){
+  clearInterval(GS.timerIv);
+  GS.qStart=Date.now();
+  GS.timerIv=setInterval(function(){
+    var el=(Date.now()-GS.qStart)/1000;
+    var pct=Math.max(0,100-(el/GS.TPERQ)*100);
+    var bar=document.getElementById('gs-tbar');
+    if(bar){bar.style.width=pct+'%';bar.style.background=pct<30?'#ef4444':pct<60?'#eab308':'#f97316';}
+    if(el>=GS.TPERQ){clearInterval(GS.timerIv);gsCheckAns(null,GS.questions[GS.qIdx]);}
+  },100);
+}
+
+// ── Answer checking ───────────────────────────────────────────────────────────
+function gsCheckAns(chosen,q){
+  clearInterval(GS.timerIv);
+  GS.totalTime+=(Date.now()-GS.qStart)/1000;
+  var ok=chosen!==null&&chosen===q.answer;
+
+  document.querySelectorAll('#gs-qopts .btn').forEach(function(btn){
+    btn.onclick=null;btn.style.cursor='default';
+    if(btn.textContent===q.answer){btn.style.background='#d1fae5';btn.style.borderColor='#10B981';btn.style.color='#065F46';}
+    else if(btn.textContent===chosen&&!ok){btn.style.background='#fee2e2';btn.style.borderColor='#EF4444';btn.style.color='#991B1B';}
+    else{btn.style.opacity='0.45';}
+  });
+
+  if(ok){
+    GS.score++;GS.streak++;if(GS.streak>GS.bestStreak)GS.bestStreak=GS.streak;
+    document.getElementById('gs-mascot').textContent=['🎉','🌟','🥳','🤩','✨'][Math.floor(Math.random()*5)];
+    gsShowFb(true,'🌟 Correct! '+q.ctry.cont+' · Capital: '+q.ctry.c,'#d1fae5','#10B981','#065F46');
+  }else{
+    GS.streak=0;
+    document.getElementById('gs-mascot').textContent='😅';
+    gsShowFb(false,(chosen===null?'⏰ Time's up! ':'💡 Not quite! ')+'Answer: '+q.answer+' · '+q.ctry.cont,'#FEF3C7','#F59E0B','#92400E');
+    GS.wrongList.push(q);
+  }
+  document.getElementById('gs-qscore').textContent='⭐ '+GS.score;
+  document.getElementById('gs-qstreak').textContent='🔥 '+GS.streak;
+  document.getElementById('gs-bnext').style.display='block';
+}
+
+function gsShowFb(ok,msg,bg,border,color){
+  var fb=document.getElementById('gs-qfb');
+  fb.style.cssText='display:block;background:'+bg+';border:2px solid '+border+';color:'+color+';border-radius:14px;padding:12px 16px;font-size:13px;font-weight:700;';
+  fb.textContent=msg;
+}
+
+function gsNextQ(){
+  GS.qIdx++;
+  if(GS.qIdx>=GS.questions.length)gsShowResults();
+  else gsRenderQ();
+}
+
+// ── Results ───────────────────────────────────────────────────────────────────
+function gsShowResults(){
+  document.getElementById('gs-question').style.display='none';
+  document.getElementById('gs-results').style.display='block';
+  var acc=Math.round((GS.score/GS.questions.length)*100);
+  var mins=Math.floor(GS.totalTime/60),secs=Math.round(GS.totalTime%60);
+  var ts=mins>0?mins+'m '+secs+'s':secs+'s';
+  var em=acc===100?'🏆':acc>=80?'🌟':acc>=60?'😊':'💪';
+  document.getElementById('gs-rmascot').textContent=em;
+  document.getElementById('gs-rtitle').textContent=acc===100?'Perfect Score! 🎉':acc>=80?'Amazing Work!':acc>=60?'Good Job!':'Keep Practising!';
+  document.getElementById('gs-rsub').textContent=acc===100?'Every single one correct!':'Score: '+GS.score+' out of '+GS.questions.length;
+  document.getElementById('gs-rcorrect').textContent=GS.score+'/'+GS.questions.length;
+  document.getElementById('gs-racc').textContent=acc+'%';
+  document.getElementById('gs-rtime').textContent=ts;
+  document.getElementById('gs-rstreak').textContent=GS.bestStreak;
+  var ww=document.getElementById('gs-rwwrap'),wl=document.getElementById('gs-rwlist');
+  wl.innerHTML='';
+  if(GS.wrongList.length>0){
+    ww.style.display='block';
+    GS.wrongList.forEach(function(q){
+      var d=document.createElement('div');
+      d.style.cssText='background:white;border-radius:12px;padding:10px 14px;border-left:4px solid var(--y);font-size:12px;border:1px solid var(--br);border-left:4px solid var(--y);margin-bottom:4px';
+      d.innerHTML='<div style="font-weight:800;color:var(--tx);margin-bottom:3px">'+q.text+'</div>'
+        +'<div style="color:var(--g);font-weight:700">✅ '+q.answer+'</div>'
+        +'<div style="color:var(--mu);font-size:11px;margin-top:2px">'+q.ctry.cont+' · Capital: '+q.ctry.c+'</div>';
+      wl.appendChild(d);
+    });
+  }else{ww.style.display='none';}
+}
+// ── END GEOSPRINT ─────────────────────────────────────────────────────────────
 </script>
 </body>
 </html>
