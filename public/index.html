@@ -2808,7 +2808,7 @@ function gsCheckAns(chosen,q){
   }else{
     GS.streak=0;
     document.getElementById('gs-mascot').textContent='😅';
-    gsShowFb(false,(chosen===null?'⏰ Time's up! ':'💡 Not quite! ')+'Answer: '+q.answer+' · '+q.ctry.cont,'#FEF3C7','#F59E0B','#92400E');
+    gsShowFb(false,(chosen===null?'⏰ Time is up! ':'💡 Not quite! ')+'Answer: '+q.answer+' · '+q.ctry.cont,'#FEF3C7','#F59E0B','#92400E');
     GS.wrongList.push(q);
   }
   document.getElementById('gs-qscore').textContent='⭐ '+GS.score;
